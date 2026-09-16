@@ -30,10 +30,6 @@ document.addEventListener('click', (event) => {
 });
 
 // Modals / Quick Actions
-function openTeamModal(event) {
-    if (event) event.preventDefault();
-    alert('Tính năng Tạo Đội (Clan / Team) đang được hoàn thiện và sẽ sớm khả dụng trong bản cập nhật kế tiếp!');
-}
 
 function openFriendsModal(event) {
     if (event) event.preventDefault();

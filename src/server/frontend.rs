@@ -475,9 +475,6 @@ pub fn render_navbar(active: &str, server_name: &str, user: Option<&User>, _is_a
                                 <a href="/u/{id}" class="dropdown-link-row">
                                     <span>Trang Cá Nhân</span>
                                 </a>
-                                <a href="#" onclick="openTeamModal(event)" class="dropdown-link-row">
-                                    <span>Tạo Đội</span>
-                                </a>
                                 <a href="#" onclick="openFriendsModal(event)" class="dropdown-link-row">
                                     <span>Bạn bè</span>
                                 </a>
