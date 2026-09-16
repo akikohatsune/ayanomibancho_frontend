@@ -15,7 +15,7 @@ use crate::utils::crypto::{
 use crate::utils::telemetry::{get_file_size_kb, get_memory_metrics, probe_mirror_health, ServerHealthReport};
 use axum::extract::{Path, Query, State};
 use axum::http::{header, HeaderMap, StatusCode};
-use axum::response::{Html, IntoResponse, Json, Response};
+use axum::response::{Html, IntoResponse, Json, Redirect, Response};
 use chrono::{DateTime, Utc};
 use pulldown_cmark::{html, Options, Parser};
 use serde::{Deserialize, Serialize};
@@ -475,7 +475,7 @@ pub fn render_navbar(active: &str, server_name: &str, user: Option<&User>, _is_a
                                 <a href="/u/{id}" class="dropdown-link-row">
                                     <span>Trang Cá Nhân</span>
                                 </a>
-                                <a href="#" onclick="openFriendsModal(event)" class="dropdown-link-row">
+                                <a href="/friends" class="dropdown-link-row">
                                     <span>Bạn bè</span>
                                 </a>
                                 <a href="#" onclick="openFollowingModal(event)" class="dropdown-link-row">
@@ -1030,6 +1030,32 @@ let is_owner = current_user.as_ref().map(|u| u.id == user.id).unwrap_or(false);
         (String::new(), String::new(), c_badge, String::new(), String::new(), String::new())
     };
 
+    let friend_action_btn = if !is_owner && current_user.is_some() {
+        let cur = current_user.as_ref().unwrap();
+        let is_fr = crate::db::friends::is_friend(&state.friends_db, cur.id, user.id).await.unwrap_or(false);
+        let is_mut = crate::db::friends::is_mutual_friend(&state.friends_db, cur.id, user.id).await.unwrap_or(false);
+        if is_fr {
+            let label = if is_mut { "✓ Bạn bè hai chiều" } else { "✓ Bạn bè" };
+            format!(
+                r###"<button id="btnProfileFriend" type="button" class="btn-friend-active" data-is-friend="true" onclick="toggleProfileFriend({})" title="Nhấn để hủy kết bạn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    <span>{}</span>
+                </button>"###,
+                user.id, label
+            )
+        } else {
+            format!(
+                r###"<button id="btnProfileFriend" type="button" class="btn-friend-add" data-is-friend="false" onclick="toggleProfileFriend({})" title="Thêm vào danh sách bạn bè">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span>+ Kết bạn</span>
+                </button>"###,
+                user.id
+            )
+        }
+    } else {
+        String::new()
+    };
+
     // profile_js now served via /static/js/profile.js
 
 
@@ -1197,7 +1223,8 @@ let is_owner = current_user.as_ref().map(|u| u.id == user.id).unwrap_or(false);
 
     let extra_js = format!(
         r###"<script>const INITIAL_RAW_BIO = {raw_bio_json};</script>
-        <script src="/static/js/profile.js"></script>"###,
+        <script src="/static/js/profile.js"></script>
+        <script src="/static/js/friends.js"></script>"###,
         raw_bio_json = raw_bio_json
     );
 
@@ -1218,6 +1245,7 @@ let is_owner = current_user.as_ref().map(|u| u.id == user.id).unwrap_or(false);
             ("AVATAR_OVERLAY", &avatar_overlay),
             ("PREFIX_TAG", &prefix_tag),
             ("COUNTRY_BADGE_HTML", &country_badge_html),
+            ("FRIEND_ACTION_BTN", &friend_action_btn),
             ("JOIN_DATE", &join_date),
             ("RANK_STD", &rank_std_str),
             ("BIO_EDIT_BTN", &bio_edit_btn),
@@ -2418,6 +2446,242 @@ pub async fn settings_page(
     );
 
     Html(html).into_response()
+}
+
+#[derive(Deserialize)]
+pub struct FriendActionRequest {
+    pub target_id: Option<i32>,
+    pub query: Option<String>,
+}
+
+pub async fn friends_page(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+) -> Response {
+    let (current_user, is_admin) = get_authenticated_user_and_admin(&state, &headers).await;
+    let user = match current_user {
+        Some(u) => u,
+        None => return Redirect::to("/login").into_response(),
+    };
+
+    let friends = crate::db::friends::get_friends_list(&state.friends_db, &state.db, user.id)
+        .await
+        .unwrap_or_default();
+
+    let total_count = friends.len();
+    let mutual_count = friends.iter().filter(|f| f.is_mutual).count();
+
+    let mut grid_html = String::new();
+    if friends.is_empty() {
+        grid_html.push_str(r###"
+            <div class="glass-card" style="text-align: center; padding: 3rem 1.5rem;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--text-muted); margin-bottom: 0.8rem;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <div style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.4rem;">Chưa có bạn bè nào</div>
+                <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 420px; margin: 0 auto 1.2rem auto;">Bạn chưa thêm người bạn nào vào danh sách. Hãy nhập tên người chơi ở thanh tìm kiếm phía trên để kết bạn!</p>
+            </div>
+        "###);
+    } else {
+        grid_html.push_str(r#"<div class="friends-grid">"#);
+        for f in &friends {
+            let flag_svg = crate::utils::country::country_flag_svg(&f.country_code, 20, 14);
+            let status_badge = if f.is_mutual {
+                r#"<span class="friend-status-badge friend-status-mutual"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> Mutual</span>"#
+            } else {
+                r#"<span class="friend-status-badge friend-status-following">Đang theo dõi</span>"#
+            };
+
+            grid_html.push_str(&format!(
+                r###"
+                <div class="friend-card" id="friend-card-{id}" data-mutual="{mutual}">
+                    <div class="friend-card-header">
+                        <a href="/u/{id}">
+                            <img src="/a/{id}" class="friend-avatar" alt="{name}">
+                        </a>
+                        <div class="friend-info">
+                            <a href="/u/{id}" class="friend-username">{name}</a>
+                            <div class="friend-country">
+                                {flag_svg}
+                                <span>{cname}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="friend-meta-row">
+                        <div style="color: var(--text-muted);">Hạng: <b style="color: #f59e0b;">#{rank}</b></div>
+                        <div style="color: var(--text-muted);"><b style="color: #fff;">{pp}</b> pp</div>
+                        <div>{status_badge}</div>
+                    </div>
+                    <div class="friend-actions-row">
+                        <a href="/u/{id}" class="btn btn-outline" style="flex: 1; font-size: 0.82rem; padding: 0.38rem 0.6rem; text-align: center;">Xem hồ sơ</a>
+                        <button type="button" class="btn-danger-subtle" onclick="handleRemoveFriend({id}, '{name_escaped}')" title="Hủy kết bạn">Hủy</button>
+                    </div>
+                </div>
+                "###,
+                id = f.user_id,
+                name = html_escape(&f.username),
+                name_escaped = f.username.replace('\'', "\\'"),
+                flag_svg = flag_svg,
+                cname = html_escape(&f.country_name),
+                rank = f.rank_std,
+                pp = format_number(f.pp_std),
+                mutual = f.is_mutual,
+                status_badge = status_badge
+            ));
+        }
+        grid_html.push_str("</div>");
+    }
+
+    let navbar = render_navbar("friends", &state.config.server.name, Some(&user), is_admin);
+    let footer = render_footer(&state.config.server.name);
+
+    let html = crate::server::templates::render_page(
+        "friends",
+        "Bạn Bè",
+        &state.config.server.name,
+        &navbar,
+        &footer,
+        "",
+        r#"<script src="/static/js/friends.js"></script>"#,
+        &[
+            ("FRIENDS_COUNT", &total_count.to_string()),
+            ("MUTUAL_COUNT", &mutual_count.to_string()),
+            ("FRIENDS_GRID_HTML", &grid_html),
+        ],
+    );
+
+    Html(html).into_response()
+}
+
+pub async fn list_friends_api(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+) -> Response {
+    let user = match get_authenticated_user(&state, &headers).await {
+        Some(u) => u,
+        None => return StatusCode::UNAUTHORIZED.into_response(),
+    };
+
+    let friends = crate::db::friends::get_friends_list(&state.friends_db, &state.db, user.id)
+        .await
+        .unwrap_or_default();
+
+    (StatusCode::OK, Json(serde_json::json!({
+        "success": true,
+        "friends": friends
+    }))).into_response()
+}
+
+pub async fn add_friend_api(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Json(payload): Json<FriendActionRequest>,
+) -> Response {
+    let user = match get_authenticated_user(&state, &headers).await {
+        Some(u) => u,
+        None => return StatusCode::UNAUTHORIZED.into_response(),
+    };
+
+    let target_id = if let Some(id) = payload.target_id {
+        id
+    } else if let Some(ref q) = payload.query {
+        let q_trimmed = q.trim();
+        if let Ok(id) = q_trimmed.parse::<i32>() {
+            id
+        } else {
+            match crate::db::users::get_user_by_username(&state.db, q_trimmed).await {
+                Ok(Some(u)) => u.id,
+                _ => {
+                    return (
+                        StatusCode::NOT_FOUND,
+                        Json(ApiResponse {
+                            success: false,
+                            message: format!("Không tìm thấy người chơi '{}'.", q_trimmed),
+                        }),
+                    ).into_response();
+                }
+            }
+        }
+    } else {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(ApiResponse {
+                success: false,
+                message: "Thiếu thông tin người chơi cần kết bạn.".to_string(),
+            }),
+        ).into_response();
+    };
+
+    if target_id == user.id {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(ApiResponse {
+                success: false,
+                message: "Bạn không thể tự kết bạn với chính mình!".to_string(),
+            }),
+        ).into_response();
+    }
+
+    match crate::db::friends::add_friend(&state.friends_db, user.id, target_id).await {
+        Ok(_) => {
+            let is_mutual = crate::db::friends::is_mutual_friend(&state.friends_db, user.id, target_id)
+                .await
+                .unwrap_or(false);
+            let msg = if is_mutual {
+                "Đã trở thành bạn bè hai chiều (Mutual)!"
+            } else {
+                "Đã thêm bạn bè thành công!"
+            };
+            (StatusCode::OK, Json(serde_json::json!({
+                "success": true,
+                "message": msg,
+                "is_mutual": is_mutual
+            }))).into_response()
+        }
+        Err(_) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(ApiResponse {
+                success: false,
+                message: "Không thể kết bạn, vui lòng thử lại sau.".to_string(),
+            }),
+        ).into_response()
+    }
+}
+
+pub async fn remove_friend_api(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Json(payload): Json<FriendActionRequest>,
+) -> Response {
+    let user = match get_authenticated_user(&state, &headers).await {
+        Some(u) => u,
+        None => return StatusCode::UNAUTHORIZED.into_response(),
+    };
+
+    let target_id = match payload.target_id {
+        Some(id) => id,
+        None => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(ApiResponse {
+                    success: false,
+                    message: "Thiếu ID người chơi cần hủy kết bạn.".to_string(),
+                }),
+            ).into_response();
+        }
+    };
+
+    match crate::db::friends::remove_friend(&state.friends_db, user.id, target_id).await {
+        Ok(_) => (StatusCode::OK, Json(ApiResponse {
+            success: true,
+            message: "Đã hủy kết bạn thành công.".to_string(),
+        })).into_response(),
+        Err(_) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(ApiResponse {
+                success: false,
+                message: "Không thể hủy kết bạn, vui lòng thử lại.".to_string(),
+            }),
+        ).into_response(),
+    }
 }
 
 #[cfg(test)]

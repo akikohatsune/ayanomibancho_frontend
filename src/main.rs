@@ -1,4 +1,4 @@
-﻿use ayanomi_frontend::config::Config;
+use ayanomi_frontend::config::Config;
 use ayanomi_frontend::db::{badges::init_badges_db, chat::init_chat_db, init_db};
 use ayanomi_frontend::server::build_web_router;
 use ayanomi_frontend::state::AppState;
@@ -31,7 +31,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let chat_pool = init_chat_db(&config.database.chat_path).await?;
     let badges_pool = init_badges_db(&config.database.badges_path).await?;
     let multi_pool = ayanomi_frontend::db::multi::init_multi_db(&config.database.multi_path).await?;
-    let app_state = AppState::new(db_pool, chat_pool, badges_pool, multi_pool, config.clone());
+    let friends_pool = ayanomi_frontend::db::friends::init_friends_db(&config.database.friends_path).await?;
+    let app_state = AppState::new(db_pool, chat_pool, badges_pool, multi_pool, friends_pool, config.clone());
 
     // Spawn Rate Limiter idle cleanup worker (every 5 mins)
     let rate_limiter_clone = app_state.rate_limiter.clone();
