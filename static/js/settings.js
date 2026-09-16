@@ -249,16 +249,120 @@ function setSettingsBioTab(mode) {
     }
 }
 
+function updateSettingsBioCounter() {
+    const input = document.getElementById('settingsBioInput');
+    const counter = document.getElementById('settingsBioCount');
+    if (!input || !counter) return;
+    const len = input.value.length;
+    counter.textContent = len;
+    if (len >= 2000) {
+        counter.style.color = '#ef4444';
+        counter.style.fontWeight = '700';
+    } else if (len >= 1800) {
+        counter.style.color = '#f59e0b';
+        counter.style.fontWeight = '600';
+    } else {
+        counter.style.color = '';
+        counter.style.fontWeight = '';
+    }
+}
+
+function formatSettingsBio(action) {
+    const input = document.getElementById('settingsBioInput');
+    if (!input) return;
+
+    // Switch to write tab so changes are immediately visible
+    setSettingsBioTab('write');
+
+    const start = input.selectionStart ?? 0;
+    const end = input.selectionEnd ?? 0;
+    const val = input.value || '';
+    const selected = val.substring(start, end);
+
+    let prefix = '';
+    let suffix = '';
+    let defaultText = '';
+
+    const isAtStartOrNewline = (start === 0 || val.charAt(start - 1) === '\n');
+
+    switch (action) {
+        case 'bold':
+            prefix = '**';
+            suffix = '**';
+            defaultText = 'chữ đậm';
+            break;
+        case 'italic':
+            prefix = '*';
+            suffix = '*';
+            defaultText = 'chữ nghiêng';
+            break;
+        case 'heading':
+            prefix = isAtStartOrNewline ? '### ' : '\n### ';
+            suffix = '';
+            defaultText = 'Tiêu đề';
+            break;
+        case 'quote':
+            prefix = isAtStartOrNewline ? '> ' : '\n> ';
+            suffix = '';
+            defaultText = 'Trích dẫn';
+            break;
+        case 'code':
+            if (selected.includes('\n')) {
+                prefix = (isAtStartOrNewline ? '' : '\n') + '```\n';
+                suffix = '\n```\n';
+                defaultText = 'code';
+            } else if (selected.length > 0) {
+                prefix = '`';
+                suffix = '`';
+                defaultText = selected;
+            } else {
+                prefix = (isAtStartOrNewline ? '' : '\n') + '```\n';
+                suffix = '\n```\n';
+                defaultText = '// code ở đây';
+            }
+            break;
+        case 'link':
+            prefix = '[';
+            suffix = '](https://example.com)';
+            defaultText = 'Tiêu đề liên kết';
+            break;
+        case 'task':
+            prefix = isAtStartOrNewline ? '- [ ] ' : '\n- [ ] ';
+            suffix = '';
+            defaultText = 'Nhiệm vụ mới';
+            break;
+        case 'table':
+            prefix = (isAtStartOrNewline ? '' : '\n') + '| Tiêu đề 1 | Tiêu đề 2 |\n| :--- | :--- |\n| ';
+            suffix = ' | Dữ liệu 2 |\n';
+            defaultText = 'Dữ liệu 1';
+            break;
+        default:
+            return;
+    }
+
+    const insertText = selected || defaultText;
+    const newCursorStart = start + prefix.length;
+    const newCursorEnd = newCursorStart + insertText.length;
+
+    input.value = val.substring(0, start) + prefix + insertText + suffix + val.substring(end);
+    input.focus();
+    input.setSelectionRange(newCursorStart, newCursorEnd);
+
+    updateSettingsBioCounter();
+}
+
 function insertSettingsBio(prefix, suffix, placeholder) {
     const input = document.getElementById('settingsBioInput');
     if (!input) return;
-    const start = input.selectionStart;
-    const end = input.selectionEnd;
-    const val = input.value;
+    setSettingsBioTab('write');
+    const start = input.selectionStart ?? 0;
+    const end = input.selectionEnd ?? 0;
+    const val = input.value || '';
     const selected = val.substring(start, end) || placeholder;
     input.value = val.substring(0, start) + prefix + selected + suffix + val.substring(end);
     input.focus();
     input.setSelectionRange(start + prefix.length, start + prefix.length + selected.length);
+    updateSettingsBioCounter();
 }
 
 async function saveSettingsBio() {
@@ -344,9 +448,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const textarea = document.getElementById('settingsBioInput');
     const counter = document.getElementById('settingsBioCount');
     if (textarea && counter) {
-        counter.textContent = textarea.value.length;
-        textarea.addEventListener('input', () => {
-            counter.textContent = textarea.value.length;
+        updateSettingsBioCounter();
+        textarea.addEventListener('input', updateSettingsBioCounter);
+        textarea.addEventListener('keyup', updateSettingsBioCounter);
+        textarea.addEventListener('change', updateSettingsBioCounter);
+
+        textarea.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 'b' || e.key === 'B') {
+                    e.preventDefault();
+                    formatSettingsBio('bold');
+                } else if (e.key === 'i' || e.key === 'I') {
+                    e.preventDefault();
+                    formatSettingsBio('italic');
+                } else if (e.key === 'k' || e.key === 'K') {
+                    e.preventDefault();
+                    formatSettingsBio('link');
+                }
+            }
         });
     }
 

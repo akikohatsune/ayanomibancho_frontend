@@ -975,14 +975,14 @@ let is_owner = current_user.as_ref().map(|u| u.id == user.id).unwrap_or(false);
                         <button id="tabPreview" type="button" class="editor-tab-btn" onclick="setEditorTab('preview')">Preview</button>
                     </div>
                     <div style="display: flex; gap: 0.3rem; align-items: center; flex-wrap: wrap;">
-                        <button type="button" class="editor-fmt-btn" onclick="insertMarkdown('**', '**', 'bold text')" title="Bold"><b>B</b></button>
-                        <button type="button" class="editor-fmt-btn" onclick="insertMarkdown('*', '*', 'italic text')" title="Italic"><i>I</i></button>
-                        <button type="button" class="editor-fmt-btn" onclick="insertMarkdown('### ', '', 'Heading')" title="Heading"><b>H</b></button>
-                        <button type="button" class="editor-fmt-btn" onclick="insertMarkdown('> ', '', 'Quote')" title="Quote"><b>&ldquo;</b></button>
-                        <button type="button" class="editor-fmt-btn" onclick="insertMarkdown('```\n', '\n```', 'code here')" title="Code Block"><code>&lt;&gt;</code></button>
-                        <button type="button" class="editor-fmt-btn" onclick="insertMarkdown('[', '](https://example.com)', 'Link text')" title="Link"><b>Link</b></button>
-                        <button type="button" class="editor-fmt-btn" onclick="insertMarkdown('- [ ] ', '', 'task')" title="Task list"><b>Task</b></button>
-                        <button type="button" class="editor-fmt-btn" onclick="insertMarkdown('| Column | Column |\n| --- | --- |\n| ', ' | value |', 'value')" title="Table"><b>Table</b></button>
+                        <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="insertMarkdown('**', '**', 'bold text')" title="Bold"><b>B</b></button>
+                        <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="insertMarkdown('*', '*', 'italic text')" title="Italic"><i>I</i></button>
+                        <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="insertMarkdown('### ', '', 'Heading')" title="Heading"><b>H</b></button>
+                        <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="insertMarkdown('> ', '', 'Quote')" title="Quote"><b>&ldquo;</b></button>
+                        <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="insertMarkdown('```\n', '\n```', 'code here')" title="Code Block"><code>&lt;&gt;</code></button>
+                        <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="insertMarkdown('[', '](https://example.com)', 'Link text')" title="Link"><b>Link</b></button>
+                        <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="insertMarkdown('- [ ] ', '', 'task')" title="Task list"><b>Task</b></button>
+                        <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="insertMarkdown('| Column | Column |\n| --- | --- |\n| ', ' | value |', 'value')" title="Table"><b>Table</b></button>
                         <span style="font-size: 0.82rem; color: var(--text-muted); margin-left: 0.8rem;"><span id="bioCharCount">0</span>/2000</span>
                     </div>
                 </div>
@@ -2430,6 +2430,8 @@ pub async fn settings_page(
 
     let settings_js = format!(r#"<script src="/static/js/settings.js?v={}"></script>"#, Utc::now().timestamp_millis());
 
+    let bio_count_str = user.bio.chars().count().to_string();
+
     let html = crate::server::templates::render_page(
         "settings",
         "Cài Đặt",
@@ -2447,6 +2449,7 @@ pub async fn settings_page(
             ("COUNTRY_OPTIONS", &country_options),
             ("RAW_BIO", &html_escape(&user.bio)),
             ("RENDERED_BIO", &rendered_bio),
+            ("BIO_COUNT", &bio_count_str),
         ],
     );
 

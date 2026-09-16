@@ -1,4 +1,4 @@
-﻿<div class="settings-container">
+<div class="settings-container">
     <div class="settings-header">
         <h1 class="settings-title">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -83,7 +83,7 @@
         <div class="glass-card settings-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <h2 class="card-section-title" style="margin: 0;">Giới thiệu bản thân ("me!")</h2>
-                <span style="font-size: 0.85rem; color: var(--text-muted);"><span id="settingsBioCount">0</span>/2000 ký tự</span>
+                <span style="font-size: 0.85rem; color: var(--text-muted);"><span id="settingsBioCount">{{BIO_COUNT}}</span>/2000 ký tự</span>
             </div>
 
             <!-- Toolbar -->
@@ -93,14 +93,14 @@
                     <button type="button" id="bioTabPreview" class="editor-tab-btn" onclick="setSettingsBioTab('preview')">Xem trước (Live Preview)</button>
                 </div>
                 <div class="toolbar-actions">
-                    <button type="button" class="editor-fmt-btn" onclick="insertSettingsBio('**', '**', 'chữ đậm')"><b>B</b></button>
-                    <button type="button" class="editor-fmt-btn" onclick="insertSettingsBio('*', '*', 'chữ nghiêng')"><i>I</i></button>
-                    <button type="button" class="editor-fmt-btn" onclick="insertSettingsBio('### ', '', 'Tiêu đề')"><b>H</b></button>
-                    <button type="button" class="editor-fmt-btn" onclick="insertSettingsBio('> ', '', 'Trích dẫn')"><b>&ldquo;</b></button>
-                    <button type="button" class="editor-fmt-btn" onclick="insertSettingsBio('`\n', '\n`', 'code block')"><code>&lt;&gt;</code></button>
-                    <button type="button" class="editor-fmt-btn" onclick="insertSettingsBio('[', '](https://example.com)', 'Liên kết')"><b>Link</b></button>
-                    <button type="button" class="editor-fmt-btn" onclick="insertSettingsBio('- [ ] ', '', 'Công việc')"><b>Task</b></button>
-                    <button type="button" class="editor-fmt-btn" onclick="insertSettingsBio('| Cột 1 | Cột 2 |\n| --- | --- |\n| ', ' | dữ liệu |', 'dữ liệu')"><b>Bảng</b></button>
+                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('bold')" title="Chữ đậm (Ctrl+B)"><b>B</b></button>
+                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('italic')" title="Chữ nghiêng (Ctrl+I)"><i>I</i></button>
+                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('heading')" title="Tiêu đề (H3)"><b>H</b></button>
+                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('quote')" title="Trích dẫn (Quote)"><b>&ldquo;</b></button>
+                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('code')" title="Mã nguồn (Code)"><code>&lt;&gt;</code></button>
+                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('link')" title="Chèn liên kết (Ctrl+K)"><b>Link</b></button>
+                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('task')" title="Danh sách việc (Task list)"><b>Task</b></button>
+                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('table')" title="Chèn bảng (Table)"><b>Bảng</b></button>
                 </div>
             </div>
 
