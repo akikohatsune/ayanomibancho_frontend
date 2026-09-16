@@ -20,6 +20,7 @@ const FALLBACK_RULES: &str = include_str!("../../templates/rules.html");
 const FALLBACK_CHANGELOG: &str = include_str!("../../templates/changelog.html");
 const FALLBACK_STAFF: &str = include_str!("../../templates/staff.html");
 const FALLBACK_MULTI: &str = include_str!("../../templates/multi.html");
+const FALLBACK_SETTINGS: &str = include_str!("../../templates/settings.html");
 const FALLBACK_404: &str = include_str!("../../templates/404.html");
 
 /// Retrieves template content from disk if present (for zero-recompile live editing),
@@ -48,6 +49,7 @@ pub fn get_template_source(name: &str) -> String {
         "changelog" => FALLBACK_CHANGELOG.to_string(),
         "staff" => FALLBACK_STAFF.to_string(),
         "multi" => FALLBACK_MULTI.to_string(),
+        "settings" => FALLBACK_SETTINGS.to_string(),
         "404" => FALLBACK_404.to_string(),
         _ => String::new(),
     }

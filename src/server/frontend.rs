@@ -436,16 +436,80 @@ pub fn render_navbar(active: &str, server_name: &str, user: Option<&User>, _is_a
     let is_login = if active == "login" { "class='active'" } else { "" };
     let nav_actions = match user {
         Some(u) => {
+            let country_info = crate::utils::country::bancho_id_to_country(u.country);
+            let flag_svg = crate::utils::country::country_flag_svg(country_info.code, 24, 16);
+            let clean_name = crate::db::badges::clean_username(&u.username);
             format!(
-                r###"<div class="nav-actions" style="display: flex; align-items: center; gap: 0.75rem;">
-                    <a href="/login" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--text-main); font-weight: 700; padding: 4px 10px; border-radius: 6px; background: var(--bg-surface-hover); border: 1px solid var(--card-border);">
-                        <img src="/a/{id}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid var(--card-border);">
-                        <span>{name}</span>
+                r###"<div class="nav-actions-user">
+                    <a href="/connect" class="nav-top-icon-btn heart-btn" title="Ủng hộ máy chủ / Supporter">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="#f43f5e"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                     </a>
-                    <a href="/logout" onclick="handleLogout(event)" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; color: var(--rose); border-color: var(--rose);">Sign Out</a>
+                    <div class="nav-flag-box" title="{country_name}">
+                        {flag_svg}
+                    </div>
+                    <button type="button" class="nav-pill-btn" title="Trò chuyện" onclick="toggleNavChat(event)">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+                        <span class="pill-dots">...</span>
+                    </button>
+                    <button type="button" class="nav-pill-btn" title="Thông báo" onclick="toggleNavNotif(event)">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                        <span class="pill-dots">...</span>
+                    </button>
+                    <div class="nav-user-dropdown-wrapper">
+                        <div class="nav-avatar-btn" onclick="toggleUserDropdown(event)">
+                            <img src="/a/{id}" class="nav-avatar-img" alt="{name}">
+                        </div>
+                        <div class="user-dropdown-card" id="userDropdownMenu">
+                            <div class="dropdown-header-banner" style="background-image: linear-gradient(180deg, rgba(15,23,42,0.15) 0%, rgba(15,23,42,0.85) 100%), url('/banner/{id}');">
+                                <div class="dropdown-osu-hexagon">
+                                    <svg viewBox="0 0 100 100" class="osu-hexagon-svg" width="46" height="46">
+                                        <polygon points="50,6 90,28 90,72 50,94 10,72 10,28" fill="none" stroke="#ffffff" stroke-width="6"/>
+                                        <circle cx="50" cy="50" r="22" fill="#ffffff"/>
+                                        <circle cx="50" cy="50" r="14" fill="#0f172a"/>
+                                        <line x1="38" y1="62" x2="62" y2="62" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <div class="dropdown-username">{name}</div>
+                            </div>
+                            <div class="dropdown-toggles-container">
+                                <label class="dropdown-toggle-row">
+                                    <input type="checkbox" id="prefLazerMode" onchange="toggleLazerPref(this.checked)">
+                                    <span class="dropdown-checkbox-box"></span>
+                                    <span class="dropdown-toggle-text">Chế độ lazer</span>
+                                </label>
+                                <label class="dropdown-toggle-row">
+                                    <input type="checkbox" id="prefClassicScore" onchange="toggleClassicScorePref(this.checked)">
+                                    <span class="dropdown-checkbox-box"></span>
+                                    <span class="dropdown-toggle-text">Hệ thống điểm cổ điển</span>
+                                </label>
+                            </div>
+                            <div class="dropdown-menu-links">
+                                <a href="/u/{id}" class="dropdown-link-row">
+                                    <span>Trang Cá Nhân</span>
+                                </a>
+                                <a href="#" onclick="openTeamModal(event)" class="dropdown-link-row">
+                                    <span>Tạo Đội</span>
+                                </a>
+                                <a href="#" onclick="openFriendsModal(event)" class="dropdown-link-row">
+                                    <span>Bạn bè</span>
+                                </a>
+                                <a href="#" onclick="openFollowingModal(event)" class="dropdown-link-row">
+                                    <span>Danh sách theo dõi</span>
+                                </a>
+                                <a href="/settings" class="dropdown-link-row">
+                                    <span>Cài Đặt</span>
+                                </a>
+                                <a href="/logout" onclick="handleLogout(event)" class="dropdown-link-row logout-row">
+                                    <span>Đăng Xuất</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>"###,
                 id = u.id,
-                name = html_escape(&u.username)
+                name = html_escape(clean_name),
+                country_name = html_escape(country_info.name),
+                flag_svg = flag_svg
             )
         }
         None => {
@@ -748,6 +812,8 @@ pub async fn leaderboard_page(
                 String::new()
             };
             let clean_name = crate::db::badges::clean_username(&u.username);
+            let country_info = crate::utils::country::bancho_id_to_country(u.country);
+            let flag_svg = crate::utils::country::country_flag_svg(country_info.code, 20, 14);
 
             table_rows.push_str(&format!(
                 r###"<tr>
@@ -756,6 +822,7 @@ pub async fn leaderboard_page(
                         <div style="display: flex; align-items: center; gap: 0.8rem;">
                             <a href="/u/{id}"><img src="/a/{id}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid var(--card-border);" alt="{username}"></a>
                             <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+                                <span title="{country_name}" style="display: inline-flex; align-items: center;">{flag_svg}</span>
                                 {prefix_tag}
                                 <a href="/u/{id}" style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">{username}</a>
                             </div>
@@ -769,6 +836,8 @@ pub async fn leaderboard_page(
                 rank_display = rank_display,
                 id = u.user_id,
                 username = html_escape(clean_name),
+                country_name = html_escape(country_info.name),
+                flag_svg = flag_svg,
                 prefix_tag = prefix_tag,
                 pp = format_number(u.pp as i64),
                 acc = u.accuracy,
@@ -861,8 +930,8 @@ let is_owner = current_user.as_ref().map(|u| u.id == user.id).unwrap_or(false);
         for c in crate::utils::country::COUNTRIES {
             let selected = if c.bancho_id == user.country { "selected" } else { "" };
             country_modal_options.push_str(&format!(
-                r#"<option value="{}" data-flag="{}" data-code="{}" data-name="{}" {}>{} {} ({})</option>"#,
-                c.bancho_id, c.flag, c.code, c.name, selected, c.flag, c.name, c.code
+                r#"<option value="{}" data-code="{}" data-name="{}" {}>{} ({})</option>"#,
+                c.bancho_id, c.code, c.name, selected, c.name, c.code
             ));
         }
     }
@@ -893,13 +962,14 @@ let is_owner = current_user.as_ref().map(|u| u.id == user.id).unwrap_or(false);
             <input type="file" id="avatarFileInput" accept=".png,.jpg,.jpeg,.webp" style="display: none;" onchange="handleAvatarUpload(event)">"###
         );
 
+        let flag_svg = crate::utils::country::country_flag_svg(country.code, 20, 14);
         let c_badge = format!(
             r###"<button type="button" onclick="openCountryModal()" class="country-edit-badge" title="Click to change country">
-                <span id="countryDisplayTxt">{} {} ({})</span>
+                <span id="countryDisplayTxt" style="display: inline-flex; align-items: center; gap: 0.45rem;">{} <span>{} ({})</span></span>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             </button>
             <button type="button" onclick="handleAvatarReset(event)" class="btn-subtle-reset" title="Reset Avatar to default Marisa">Reset Avatar</button>"###,
-            country.flag, country.name, country.code
+            flag_svg, country.name, country.code
         );
 
         let b_btn = format!(
@@ -967,9 +1037,10 @@ let is_owner = current_user.as_ref().map(|u| u.id == user.id).unwrap_or(false);
 
         (cover_act, av_ov, c_badge, b_btn, b_sec, modal)
     } else {
+        let flag_svg = crate::utils::country::country_flag_svg(country.code, 20, 14);
         let c_badge = format!(
-            r#"<span class="country-tag" style="font-size: 0.9rem; padding: 3px 8px;">{} {} ({})</span>"#,
-            country.flag, country.name, country.code
+            r#"<span class="country-tag" style="font-size: 0.9rem; padding: 3px 8px; display: inline-flex; align-items: center; gap: 0.45rem;">{} <span>{} ({})</span></span>"#,
+            flag_svg, country.name, country.code
         );
         (String::new(), String::new(), c_badge, String::new(), String::new(), String::new())
     };
@@ -2215,6 +2286,153 @@ pub async fn multi_page(
     );
 
     Html(html)
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ChangePasswordRequest {
+    pub current_password: String,
+    pub new_password: String,
+    pub confirm_password: String,
+}
+
+pub async fn change_password_api(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Json(payload): Json<ChangePasswordRequest>,
+) -> Response {
+    let user = match get_authenticated_user(&state, &headers).await {
+        Some(u) => u,
+        None => {
+            return (
+                StatusCode::UNAUTHORIZED,
+                Json(ApiResponse {
+                    success: false,
+                    message: "Vui lòng đăng nhập để đổi mật khẩu.".to_string(),
+                }),
+            )
+                .into_response();
+        }
+    };
+
+    if payload.new_password.len() < 6 {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(ApiResponse {
+                success: false,
+                message: "Mật khẩu mới phải có ít nhất 6 ký tự.".to_string(),
+            }),
+        )
+            .into_response();
+    }
+
+    if payload.new_password != payload.confirm_password {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(ApiResponse {
+                success: false,
+                message: "Mật khẩu xác nhận không khớp.".to_string(),
+            }),
+        )
+            .into_response();
+    }
+
+    if !verify_password(&payload.current_password, &user.password_hash) {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(ApiResponse {
+                success: false,
+                message: "Mật khẩu hiện tại không chính xác.".to_string(),
+            }),
+        )
+            .into_response();
+    }
+
+    let Ok(new_hash) = hash_password(&payload.new_password) else {
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(ApiResponse {
+                success: false,
+                message: "Không thể mã hóa mật khẩu mới.".to_string(),
+            }),
+        )
+            .into_response();
+    };
+
+    if let Err(e) = crate::db::users::update_user_password(&state.db, user.id, &new_hash).await {
+        tracing::error!("Failed to update password for user {}: {}", user.id, e);
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(ApiResponse {
+                success: false,
+                message: "Lỗi hệ thống khi cập nhật mật khẩu.".to_string(),
+            }),
+        )
+            .into_response();
+    }
+
+    (
+        StatusCode::OK,
+        Json(ApiResponse {
+            success: true,
+            message: "Đổi mật khẩu thành công!".to_string(),
+        }),
+    )
+        .into_response()
+}
+
+pub async fn settings_page(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+) -> Response {
+    let (current_user, is_admin) = get_authenticated_user_and_admin(&state, &headers).await;
+    let user = match current_user {
+        Some(u) => u,
+        None => {
+            return axum::response::Redirect::to("/login").into_response();
+        }
+    };
+
+    let country_info = crate::utils::country::bancho_id_to_country(user.country);
+    let country_flag_svg = crate::utils::country::country_flag_svg(country_info.code, 28, 19);
+
+    let mut country_options = String::new();
+    for c in crate::utils::country::COUNTRIES {
+        let selected = if c.bancho_id == user.country { "selected" } else { "" };
+        country_options.push_str(&format!(
+            r#"<option value="{id}" data-code="{code}" {selected}>{name} ({code})</option>"#,
+            id = c.bancho_id,
+            code = c.code,
+            name = c.name,
+            selected = selected
+        ));
+    }
+
+    let rendered_bio = render_bio_markdown(&user.bio);
+    let navbar = render_navbar("settings", &state.config.server.name, Some(&user), is_admin);
+    let footer = render_footer(&state.config.server.name);
+    let user_id_str = user.id.to_string();
+
+    let html = crate::server::templates::render_page(
+        "settings",
+        "Cài Đặt",
+        &state.config.server.name,
+        &navbar,
+        &footer,
+        "",
+        r#"<script src="/static/js/settings.js"></script>"#,
+        &[
+            ("USER_ID", &user_id_str),
+            ("USERNAME", &html_escape(&user.username)),
+            ("COUNTRY_CODE", country_info.code),
+            ("COUNTRY_NAME", country_info.name),
+            ("COUNTRY_FLAG_SVG", &country_flag_svg),
+            ("COUNTRY_OPTIONS", &country_options),
+            ("RAW_BIO", &html_escape(&user.bio)),
+            ("RENDERED_BIO", &rendered_bio),
+        ],
+    );
+
+    Html(html).into_response()
 }
 
 #[cfg(test)]

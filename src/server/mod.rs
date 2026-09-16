@@ -54,6 +54,8 @@ pub fn build_web_router(state: AppState) -> Router {
         .route("/api/profile/update", post(frontend::update_profile_api))
         .route("/api/profile/bio/preview", post(frontend::preview_bio_api))
         .route("/api/profile/avatar", post(avatars::upload_avatar_api))
+        .route("/settings", get(frontend::settings_page))
+        .route("/api/settings/password", post(frontend::change_password_api))
         .route("/admin", get(frontend::admin_page))
         .route("/health", get(web::web_health))
         .route("/health/web", get(web::web_health))

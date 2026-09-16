@@ -293,3 +293,27 @@ pub fn bancho_id_to_country(id: u8) -> &'static CountryInfo {
         .find(|c| c.bancho_id == id)
         .unwrap_or(&DEFAULT_COUNTRY_INFO)
 }
+
+pub fn country_flag_svg(code: &str, width: u32, height: u32) -> String {
+    let code_upper = code.trim().to_uppercase();
+    if code_upper == "VN" {
+        format!(
+            r###"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="{w}" height="{h}" class="country-flag-svg" title="Vietnam" style="border-radius: 3px; display: inline-block; vertical-align: middle; box-shadow: 0 1px 3px rgba(0,0,0,0.35); flex-shrink: 0;"><rect width="900" height="600" fill="#da251d"/><polygon points="450,150 491.2,276.8 624.5,276.8 516.6,355.2 557.9,482 450,403.6 342.1,482 383.4,355.2 275.5,276.8 408.8,276.8" fill="#ffff00"/></svg>"###,
+            w = width,
+            h = height
+        )
+    } else if code_upper == "JP" {
+        format!(
+            r###"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="{w}" height="{h}" class="country-flag-svg" title="Japan" style="border-radius: 3px; display: inline-block; vertical-align: middle; box-shadow: 0 1px 3px rgba(0,0,0,0.35); flex-shrink: 0;"><rect width="900" height="600" fill="#ffffff"/><circle cx="450" cy="300" r="180" fill="#bc002d"/></svg>"###,
+            w = width,
+            h = height
+        )
+    } else {
+        format!(
+            r###"<img src="https://purecatamphetamine.github.io/country-flag-icons/3x2/{code}.svg" width="{w}" height="{h}" class="country-flag-svg" alt="{code}" title="{code}" loading="lazy" style="border-radius: 3px; display: inline-block; vertical-align: middle; object-fit: cover; box-shadow: 0 1px 3px rgba(0,0,0,0.35); flex-shrink: 0;" onerror="this.style.display='none'"/>"###,
+            code = code_upper,
+            w = width,
+            h = height
+        )
+    }
+}
