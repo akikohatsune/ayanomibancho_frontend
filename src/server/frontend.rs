@@ -471,18 +471,6 @@ pub fn render_navbar(active: &str, server_name: &str, user: Option<&User>, _is_a
                                 </div>
                                 <div class="dropdown-username">{name}</div>
                             </div>
-                            <div class="dropdown-toggles-container">
-                                <label class="dropdown-toggle-row">
-                                    <input type="checkbox" id="prefLazerMode" onchange="toggleLazerPref(this.checked)">
-                                    <span class="dropdown-checkbox-box"></span>
-                                    <span class="dropdown-toggle-text">Chế độ lazer</span>
-                                </label>
-                                <label class="dropdown-toggle-row">
-                                    <input type="checkbox" id="prefClassicScore" onchange="toggleClassicScorePref(this.checked)">
-                                    <span class="dropdown-checkbox-box"></span>
-                                    <span class="dropdown-toggle-text">Hệ thống điểm cổ điển</span>
-                                </label>
-                            </div>
                             <div class="dropdown-menu-links">
                                 <a href="/u/{id}" class="dropdown-link-row">
                                     <span>Trang Cá Nhân</span>

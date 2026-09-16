@@ -1,4 +1,4 @@
-﻿// AyanomiBancho Shared Frontend Scripts
+// AyanomiBancho Shared Frontend Scripts
 
 async function handleLogout(e) {
     if (e) e.preventDefault();
@@ -28,17 +28,6 @@ document.addEventListener('click', (event) => {
         }
     }
 });
-
-// Quick Toggles (Lazer mode & Classic scoring)
-function toggleLazerPref(checked) {
-    localStorage.setItem('ayanomi_lazer_mode', checked ? 'true' : 'false');
-    showNavQuickToast(checked ? 'Đã bật chế độ Lazer!' : 'Đã tắt chế độ Lazer.');
-}
-
-function toggleClassicScorePref(checked) {
-    localStorage.setItem('ayanomi_classic_score', checked ? 'true' : 'false');
-    showNavQuickToast(checked ? 'Đã bật hệ thống điểm cổ điển!' : 'Đã tắt hệ thống điểm cổ điển.');
-}
 
 // Modals / Quick Actions
 function openTeamModal(event) {
@@ -83,14 +72,6 @@ function showNavQuickToast(msg) {
 
 // Initialize Preferences on load
 document.addEventListener('DOMContentLoaded', () => {
-    const lazerCheckbox = document.getElementById('prefLazerMode');
-    if (lazerCheckbox) {
-        lazerCheckbox.checked = localStorage.getItem('ayanomi_lazer_mode') === 'true';
-    }
-    const classicCheckbox = document.getElementById('prefClassicScore');
-    if (classicCheckbox) {
-        classicCheckbox.checked = localStorage.getItem('ayanomi_classic_score') === 'true';
-    }
     const theme = localStorage.getItem('ayanomi_theme');
     if (theme) {
         document.body.dataset.theme = theme;
