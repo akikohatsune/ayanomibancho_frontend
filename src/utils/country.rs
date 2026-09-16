@@ -309,9 +309,11 @@ pub fn country_flag_svg(code: &str, width: u32, height: u32) -> String {
             h = height
         )
     } else {
+        let code_lower = code_upper.to_lowercase();
         format!(
-            r###"<img src="https://purecatamphetamine.github.io/country-flag-icons/3x2/{code}.svg" width="{w}" height="{h}" class="country-flag-svg" alt="{code}" title="{code}" loading="lazy" style="border-radius: 3px; display: inline-block; vertical-align: middle; object-fit: cover; box-shadow: 0 1px 3px rgba(0,0,0,0.35); flex-shrink: 0;" onerror="this.style.display='none'"/>"###,
-            code = code_upper,
+            r###"<img src="https://flagcdn.com/{code_lower}.svg" width="{w}" height="{h}" class="country-flag-svg" alt="{code_upper}" title="{code_upper}" loading="lazy" style="border-radius: 3px; display: inline-block; vertical-align: middle; object-fit: cover; box-shadow: 0 1px 3px rgba(0,0,0,0.35); flex-shrink: 0;" onerror="this.style.display='none'"/>"###,
+            code_lower = code_lower,
+            code_upper = code_upper,
             w = width,
             h = height
         )

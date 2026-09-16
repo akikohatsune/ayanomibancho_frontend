@@ -257,13 +257,24 @@ let currentBio = typeof INITIAL_RAW_BIO !== 'undefined' ? INITIAL_RAW_BIO : "";
             if (modal) modal.style.display = 'none';
         }
 
+        function getFlagSvgHtml(code, width = 20, height = 14) {
+            const c = (code || 'VN').toUpperCase();
+            if (c === 'VN') {
+                return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="${width}" height="${height}" class="country-flag-svg" title="Vietnam" style="border-radius: 3px; display: inline-block; vertical-align: middle; box-shadow: 0 1px 3px rgba(0,0,0,0.35); flex-shrink: 0;"><rect width="900" height="600" fill="#da251d"/><polygon points="450,150 491.2,276.8 624.5,276.8 516.6,355.2 557.9,482 450,403.6 342.1,482 383.4,355.2 275.5,276.8 408.8,276.8" fill="#ffff00"/></svg>`;
+            } else if (c === 'JP') {
+                return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="${width}" height="${height}" class="country-flag-svg" title="Japan" style="border-radius: 3px; display: inline-block; vertical-align: middle; box-shadow: 0 1px 3px rgba(0,0,0,0.35); flex-shrink: 0;"><rect width="900" height="600" fill="#ffffff"/><circle cx="450" cy="300" r="180" fill="#bc002d"/></svg>`;
+            } else {
+                const lower = c.toLowerCase();
+                return `<img src="https://flagcdn.com/${lower}.svg" width="${width}" height="${height}" class="country-flag-svg" alt="${c}" title="${c}" style="border-radius: 3px; display: inline-block; vertical-align: middle; object-fit: cover; box-shadow: 0 1px 3px rgba(0,0,0,0.35); flex-shrink: 0;" onerror="this.style.display='none'">`;
+            }
+        }
+
         async function saveCountryChange() {
             const select = document.getElementById('countryModalSelect');
             if (!select) return;
             const cid = select.value;
             const opt = select.options[select.selectedIndex];
-            const flag = opt ? opt.getAttribute('data-flag') || '' : '';
-            const code = opt ? opt.getAttribute('data-code') || '' : '';
+            const code = opt ? opt.getAttribute('data-code') || 'VN' : 'VN';
             const name = opt ? opt.getAttribute('data-name') || '' : '';
 
             closeCountryModal();
@@ -278,7 +289,12 @@ let currentBio = typeof INITIAL_RAW_BIO !== 'undefined' ? INITIAL_RAW_BIO : "";
                 const data = await res.json();
                 if (res.ok && data.success) {
                     const el = document.getElementById('countryDisplayTxt');
-                    if (el) el.textContent = `${flag} ${name} (${code})`;
+                    if (el) {
+                        el.innerHTML = `${getFlagSvgHtml(code, 20, 14)} <span>${name} (${code})</span>`;
+                    }
+                    document.querySelectorAll('.nav-flag-box').forEach(box => {
+                        box.innerHTML = getFlagSvgHtml(code, 24, 16);
+                    });
                     showToast("Country updated successfully!", "success");
                 } else {
                     showToast(data.message || "Failed to update country.", "error");

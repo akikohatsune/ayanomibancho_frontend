@@ -1,4 +1,4 @@
-﻿function showSettingsToast(msg, isError = false) {
+function showSettingsToast(msg, isError = false) {
     const toast = document.getElementById('settingsToast');
     if (!toast) return;
     toast.textContent = msg;
@@ -99,7 +99,7 @@ async function handleSettingsBannerUpload(e) {
             const timestamp = Date.now();
             const bannerPreview = document.getElementById('settingsBannerPreview');
             if (bannerPreview) {
-                bannerPreview.style.backgroundImage = url('/banner/?v=');
+                bannerPreview.style.backgroundImage = `url('/banner/?v=${timestamp}')`;
             }
             showSettingsToast(res.message || 'Cập nhật ảnh bìa thành công!');
         } else {
@@ -120,7 +120,7 @@ async function handleSettingsBannerReset() {
             const timestamp = Date.now();
             const bannerPreview = document.getElementById('settingsBannerPreview');
             if (bannerPreview) {
-                bannerPreview.style.backgroundImage = url('/banner/0?v=');
+                bannerPreview.style.backgroundImage = `url('/banner/0?v=${timestamp}')`;
             }
             showSettingsToast(res.message || 'Đã đặt lại ảnh bìa mặc định!');
         } else {
@@ -131,18 +131,25 @@ async function handleSettingsBannerReset() {
     }
 }
 
+function getSettingsFlagSvg(code, width = 28, height = 19) {
+    const c = (code || 'VN').toUpperCase();
+    if (c === 'VN') {
+        return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="${width}" height="${height}" class="country-flag-svg" title="Vietnam" style="border-radius: 3px; display: inline-block; vertical-align: middle; box-shadow: 0 1px 3px rgba(0,0,0,0.35); flex-shrink: 0;"><rect width="900" height="600" fill="#da251d"/><polygon points="450,150 491.2,276.8 624.5,276.8 516.6,355.2 557.9,482 450,403.6 342.1,482 383.4,355.2 275.5,276.8 408.8,276.8" fill="#ffff00"/></svg>`;
+    } else if (c === 'JP') {
+        return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="${width}" height="${height}" class="country-flag-svg" title="Japan" style="border-radius: 3px; display: inline-block; vertical-align: middle; box-shadow: 0 1px 3px rgba(0,0,0,0.35); flex-shrink: 0;"><rect width="900" height="600" fill="#ffffff"/><circle cx="450" cy="300" r="180" fill="#bc002d"/></svg>`;
+    } else {
+        const lower = c.toLowerCase();
+        return `<img src="https://flagcdn.com/${lower}.svg" width="${width}" height="${height}" class="country-flag-svg" alt="${c}" title="${c}" style="border-radius: 3px; display: inline-block; vertical-align: middle; object-fit: cover; box-shadow: 0 1px 3px rgba(0,0,0,0.35); flex-shrink: 0;" onerror="this.style.display='none'">`;
+    }
+}
+
 // Country save & preview
 function updateCountryFlagPreview(selectEl) {
     const selectedOption = selectEl.options[selectEl.selectedIndex];
     const code = (selectedOption?.dataset?.code || 'VN').toUpperCase();
     const flagBox = document.getElementById('settingsCurrentFlag');
-    if (!flagBox) return;
-    if (code === 'VN') {
-        flagBox.innerHTML = <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="28" height="19" class="country-flag-svg" title="Vietnam" style="border-radius: 3px; display: inline-block; vertical-align: middle; box-shadow: 0 1px 3px rgba(0,0,0,0.35);"><rect width="900" height="600" fill="#da251d"/><polygon points="450,150 491.2,276.8 624.5,276.8 516.6,355.2 557.9,482 450,403.6 342.1,482 383.4,355.2 275.5,276.8 408.8,276.8" fill="#ffff00"/></svg>;
-    } else if (code === 'JP') {
-        flagBox.innerHTML = <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="28" height="19" class="country-flag-svg" title="Japan" style="border-radius: 3px; display: inline-block; vertical-align: middle; box-shadow: 0 1px 3px rgba(0,0,0,0.35);"><rect width="900" height="600" fill="#ffffff"/><circle cx="450" cy="300" r="180" fill="#bc002d"/></svg>;
-    } else {
-        flagBox.innerHTML = <img src="https://purecatamphetamine.github.io/country-flag-icons/3x2/.svg" width="28" height="19" class="country-flag-svg" alt="" style="border-radius: 3px; display: inline-block; vertical-align: middle; object-fit: cover; box-shadow: 0 1px 3px rgba(0,0,0,0.35);">;
+    if (flagBox) {
+        flagBox.innerHTML = getSettingsFlagSvg(code, 28, 19);
     }
 }
 
@@ -150,6 +157,8 @@ async function saveSettingsCountry() {
     const select = document.getElementById('settingsCountrySelect');
     if (!select) return;
     const country = select.value;
+    const selectedOption = select.options[select.selectedIndex];
+    const code = (selectedOption?.dataset?.code || 'VN').toUpperCase();
     try {
         const resp = await fetch('/api/profile/update', {
             method: 'POST',
@@ -158,6 +167,9 @@ async function saveSettingsCountry() {
         });
         const res = await resp.json();
         if (res.success) {
+            document.querySelectorAll('.nav-flag-box').forEach(box => {
+                box.innerHTML = getSettingsFlagSvg(code, 24, 16);
+            });
             showSettingsToast('Đã lưu quốc gia thành công!');
         } else {
             showSettingsToast(res.message || 'Lỗi khi lưu quốc gia.', true);
@@ -287,7 +299,7 @@ function selectTheme(theme, el) {
     if (el) el.classList.add('active');
     localStorage.setItem('ayanomi_theme', theme);
     document.body.dataset.theme = theme;
-    showSettingsToast(Đã áp dụng chủ đề: );
+    showSettingsToast(`Đã áp dụng chủ đề: ${theme}`);
 }
 
 function toggleSoundPref(checked) {
