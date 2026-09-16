@@ -352,15 +352,18 @@ pub async fn update_profile_api(
 }
 
 pub async fn preview_bio_api(
-    State(state): State<AppState>,
-    headers: HeaderMap,
+    State(_state): State<AppState>,
     Json(payload): Json<BioPreviewRequest>,
 ) -> Response {
-    if get_authenticated_user(&state, &headers).await.is_none() {
-        return StatusCode::UNAUTHORIZED.into_response();
-    }
     if payload.bio.len() > 2000 {
-        return StatusCode::PAYLOAD_TOO_LARGE.into_response();
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "success": false,
+                "message": "Bio không được vượt quá 2000 ký tự."
+            })),
+        )
+            .into_response();
     }
     Json(serde_json::json!({
         "success": true,
@@ -2425,6 +2428,8 @@ pub async fn settings_page(
     let footer = render_footer(&state.config.server.name);
     let user_id_str = user.id.to_string();
 
+    let settings_js = format!(r#"<script src="/static/js/settings.js?v={}"></script>"#, Utc::now().timestamp_millis());
+
     let html = crate::server::templates::render_page(
         "settings",
         "Cài Đặt",
@@ -2432,7 +2437,7 @@ pub async fn settings_page(
         &navbar,
         &footer,
         "",
-        r#"<script src="/static/js/settings.js"></script>"#,
+        &settings_js,
         &[
             ("USER_ID", &user_id_str),
             ("USERNAME", &html_escape(&user.username)),

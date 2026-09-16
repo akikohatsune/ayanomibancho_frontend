@@ -179,6 +179,30 @@ async function saveSettingsCountry() {
     }
 }
 
+function quickClientMarkdown(raw) {
+    if (!raw || !raw.trim()) {
+        return '<i style="color: var(--text-muted);">Không có nội dung để hiển thị.</i>';
+    }
+    let html = raw
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    html = html.replace(/^### (.*$)/gim, '<h3 style="margin-top:0.6rem; margin-bottom:0.4rem; color:var(--primary); font-size:1.15rem;">$1</h3>');
+    html = html.replace(/^## (.*$)/gim, '<h2 style="margin-top:0.8rem; margin-bottom:0.5rem; font-size:1.3rem;">$1</h2>');
+    html = html.replace(/^# (.*$)/gim, '<h1 style="margin-top:1rem; margin-bottom:0.6rem; font-size:1.5rem;">$1</h1>');
+    html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+    html = html.replace(/\*(.*?)\*/g, '<i>$1</i>');
+    html = html.replace(/~~(.*?)~~/g, '<del>$1</del>');
+    html = html.replace(/^> (.*$)/gim, '<blockquote style="border-left:3px solid var(--primary); margin:0.5rem 0; padding-left:0.8rem; color:var(--text-muted);">$1</blockquote>');
+    html = html.replace(/```([\s\S]*?)```/g, '<pre style="background:rgba(0,0,0,0.3); padding:0.8rem; border-radius:6px; overflow-x:auto;"><code>$1</code></pre>');
+    html = html.replace(/`([^`]+)`/g, '<code style="background:rgba(0,0,0,0.3); padding:2px 5px; border-radius:4px;">$1</code>');
+    html = html.replace(/!\[([^\]]*)\]\((https?:\/\/[^\)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%; border-radius:6px; margin:0.5rem 0;" />');
+    html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" style="color:var(--primary); text-decoration:underline;">$1</a>');
+    html = html.replace(/\n/g, '<br>');
+    return html;
+}
+
 // Markdown Bio
 function setSettingsBioTab(mode) {
     const tabWrite = document.getElementById('bioTabWrite');
@@ -188,30 +212,38 @@ function setSettingsBioTab(mode) {
     const textarea = document.getElementById('settingsBioInput');
 
     if (mode === 'write') {
-        tabWrite?.classList.add('active');
-        tabPreview?.classList.remove('active');
+        if (tabWrite) tabWrite.classList.add('active');
+        if (tabPreview) tabPreview.classList.remove('active');
         if (writeArea) writeArea.style.display = 'block';
         if (previewArea) previewArea.style.display = 'none';
     } else {
-        tabPreview?.classList.add('active');
-        tabWrite?.classList.remove('active');
+        if (tabPreview) tabPreview.classList.add('active');
+        if (tabWrite) tabWrite.classList.remove('active');
         if (writeArea) writeArea.style.display = 'none';
         if (previewArea) {
             previewArea.style.display = 'block';
-            previewArea.innerHTML = '<span style=\"color: var(--text-muted);\">Đang tải xem trước...</span>';
+            const val = textarea ? textarea.value : '';
+
+            // Instant client-side preview (0ms latency)
+            previewArea.innerHTML = quickClientMarkdown(val);
+
+            // Fetch high-fidelity server GFM & ammonia sanitized preview
             fetch('/api/profile/bio/preview', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ bio: textarea?.value || '' })
+                body: JSON.stringify({ bio: val })
             })
-            .then(r => r.json())
+            .then(r => {
+                if (!r.ok) throw new Error('Status ' + r.status);
+                return r.json();
+            })
             .then(data => {
-                if (data.success) {
-                    previewArea.innerHTML = data.rendered_html || '<i style=\"color: var(--text-muted);\">Không có nội dung để hiển thị.</i>';
+                if (data.success && data.rendered_html) {
+                    previewArea.innerHTML = data.rendered_html;
                 }
             })
-            .catch(() => {
-                previewArea.innerHTML = '<span style=\"color: var(--rose);\">Lỗi khi kết xuất Markdown.</span>';
+            .catch(err => {
+                console.warn('Using client-side bio preview:', err);
             });
         }
     }
