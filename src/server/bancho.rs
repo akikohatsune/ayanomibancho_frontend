@@ -369,7 +369,7 @@ async fn handle_login(state: AppState, headers: &HeaderMap, client_ip: std::net:
 
     let welcome_pm = ChatMessage {
         sender: bot_name,
-        content: format!("Chào mừng {} đến với AyanomiBancho! Gõ !help để xem các lệnh bot.", display_name),
+        content: format!("Welcome {} to AyanomiBancho! Type !help to view bot commands.", display_name),
         target: display_name.clone(),
         sender_id: bot_id,
     };

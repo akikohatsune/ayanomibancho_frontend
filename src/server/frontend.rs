@@ -360,7 +360,7 @@ pub async fn preview_bio_api(
             StatusCode::BAD_REQUEST,
             Json(serde_json::json!({
                 "success": false,
-                "message": "Bio không được vượt quá 2000 ký tự."
+                "message": "Bio cannot exceed 2000 characters."
             })),
         )
             .into_response();
@@ -448,23 +448,23 @@ pub fn render_navbar(active: &str, server_name: &str, user: Option<&User>, _is_a
                         </div>
                         <div class="user-dropdown-card" id="userDropdownMenu">
                             <div class="dropdown-header-banner" style="background-image: linear-gradient(180deg, rgba(15,23,42,0.15) 0%, rgba(15,23,42,0.85) 100%), url('/banner/{id}');">
-                                <a href="/u/{id}" class="dropdown-avatar-wrapper" title="Trang cá nhân của {name}">
+                                <a href="/u/{id}" class="dropdown-avatar-wrapper" title="{name}'s Profile">
                                     <img src="/a/{id}" class="dropdown-header-avatar nav-avatar-img" alt="{name}">
                                 </a>
                                 <a href="/u/{id}" class="dropdown-username">{name}</a>
                             </div>
                             <div class="dropdown-menu-links">
                                 <a href="/u/{id}" class="dropdown-link-row">
-                                    <span>Trang Cá Nhân</span>
+                                    <span>Profile</span>
                                 </a>
                                 <a href="/friends" class="dropdown-link-row">
-                                    <span>Bạn bè</span>
+                                    <span>Friends</span>
                                 </a>
                                 <a href="/settings" class="dropdown-link-row">
-                                    <span>Cài Đặt</span>
+                                    <span>Settings</span>
                                 </a>
                                 <a href="/logout" onclick="handleLogout(event)" class="dropdown-link-row logout-row">
-                                    <span>Đăng Xuất</span>
+                                    <span>Log Out</span>
                                 </a>
                             </div>
                         </div>
@@ -1012,9 +1012,9 @@ let is_owner = current_user.as_ref().map(|u| u.id == user.id).unwrap_or(false);
         let is_fr = crate::db::friends::is_friend(&state.friends_db, cur.id, user.id).await.unwrap_or(false);
         let is_mut = crate::db::friends::is_mutual_friend(&state.friends_db, cur.id, user.id).await.unwrap_or(false);
         if is_fr {
-            let label = if is_mut { "✓ Bạn bè hai chiều" } else { "✓ Bạn bè" };
+            let label = if is_mut { "✓ Mutual Friend" } else { "✓ Friend" };
             format!(
-                r###"<button id="btnProfileFriend" type="button" class="btn-friend-active" data-is-friend="true" onclick="toggleProfileFriend({})" title="Nhấn để hủy kết bạn">
+                r###"<button id="btnProfileFriend" type="button" class="btn-friend-active" data-is-friend="true" onclick="toggleProfileFriend({})" title="Click to remove friend">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                     <span>{}</span>
                 </button>"###,
@@ -1022,9 +1022,9 @@ let is_owner = current_user.as_ref().map(|u| u.id == user.id).unwrap_or(false);
             )
         } else {
             format!(
-                r###"<button id="btnProfileFriend" type="button" class="btn-friend-add" data-is-friend="false" onclick="toggleProfileFriend({})" title="Thêm vào danh sách bạn bè">
+                r###"<button id="btnProfileFriend" type="button" class="btn-friend-add" data-is-friend="false" onclick="toggleProfileFriend({})" title="Add to friends">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    <span>+ Kết bạn</span>
+                    <span>+ Add Friend</span>
                 </button>"###,
                 user.id
             )
@@ -2297,7 +2297,7 @@ pub async fn change_password_api(
                 StatusCode::UNAUTHORIZED,
                 Json(ApiResponse {
                     success: false,
-                    message: "Vui lòng đăng nhập để đổi mật khẩu.".to_string(),
+                    message: "Please log in to change your password.".to_string(),
                 }),
             )
                 .into_response();
@@ -2309,7 +2309,7 @@ pub async fn change_password_api(
             StatusCode::BAD_REQUEST,
             Json(ApiResponse {
                 success: false,
-                message: "Mật khẩu mới phải có ít nhất 6 ký tự.".to_string(),
+                message: "New password must be at least 6 characters long.".to_string(),
             }),
         )
             .into_response();
@@ -2320,7 +2320,7 @@ pub async fn change_password_api(
             StatusCode::BAD_REQUEST,
             Json(ApiResponse {
                 success: false,
-                message: "Mật khẩu xác nhận không khớp.".to_string(),
+                message: "Confirm password does not match.".to_string(),
             }),
         )
             .into_response();
@@ -2331,7 +2331,7 @@ pub async fn change_password_api(
             StatusCode::BAD_REQUEST,
             Json(ApiResponse {
                 success: false,
-                message: "Mật khẩu hiện tại không chính xác.".to_string(),
+                message: "Current password is incorrect.".to_string(),
             }),
         )
             .into_response();
@@ -2342,7 +2342,7 @@ pub async fn change_password_api(
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(ApiResponse {
                 success: false,
-                message: "Không thể mã hóa mật khẩu mới.".to_string(),
+                message: "Failed to hash new password.".to_string(),
             }),
         )
             .into_response();
@@ -2354,7 +2354,7 @@ pub async fn change_password_api(
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(ApiResponse {
                 success: false,
-                message: "Lỗi hệ thống khi cập nhật mật khẩu.".to_string(),
+                message: "System error while updating password.".to_string(),
             }),
         )
             .into_response();
@@ -2364,7 +2364,7 @@ pub async fn change_password_api(
         StatusCode::OK,
         Json(ApiResponse {
             success: true,
-            message: "Đổi mật khẩu thành công!".to_string(),
+            message: "Password updated successfully!".to_string(),
         }),
     )
         .into_response()
@@ -2408,7 +2408,7 @@ pub async fn settings_page(
 
     let html = crate::server::templates::render_page(
         "settings",
-        "Cài Đặt",
+        "Settings",
         &state.config.server.name,
         &navbar,
         &footer,
@@ -2458,8 +2458,8 @@ pub async fn friends_page(
         grid_html.push_str(r###"
             <div class="glass-card" style="text-align: center; padding: 3rem 1.5rem;">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--text-muted); margin-bottom: 0.8rem;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                <div style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.4rem;">Chưa có bạn bè nào</div>
-                <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 420px; margin: 0 auto 1.2rem auto;">Bạn chưa thêm người bạn nào vào danh sách. Hãy nhập tên người chơi ở thanh tìm kiếm phía trên để kết bạn!</p>
+                <div style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.4rem;">No friends yet</div>
+                <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 420px; margin: 0 auto 1.2rem auto;">You haven't added any friends yet. Enter a player username or ID above to add friends!</p>
             </div>
         "###);
     } else {
@@ -2469,7 +2469,7 @@ pub async fn friends_page(
             let status_badge = if f.is_mutual {
                 r#"<span class="friend-status-badge friend-status-mutual"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> Mutual</span>"#
             } else {
-                r#"<span class="friend-status-badge friend-status-following">Đang theo dõi</span>"#
+                r#"<span class="friend-status-badge friend-status-following">Following</span>"#
             };
 
             grid_html.push_str(&format!(
@@ -2488,13 +2488,13 @@ pub async fn friends_page(
                         </div>
                     </div>
                     <div class="friend-meta-row">
-                        <div style="color: var(--text-muted);">Hạng: <b style="color: #f59e0b;">#{rank}</b></div>
+                        <div style="color: var(--text-muted);">Rank: <b style="color: #f59e0b;">#{rank}</b></div>
                         <div style="color: var(--text-muted);"><b style="color: #fff;">{pp}</b> pp</div>
                         <div>{status_badge}</div>
                     </div>
                     <div class="friend-actions-row">
-                        <a href="/u/{id}" class="btn btn-outline" style="flex: 1; font-size: 0.82rem; padding: 0.38rem 0.6rem; text-align: center;">Xem hồ sơ</a>
-                        <button type="button" class="btn-danger-subtle" onclick="handleRemoveFriend({id}, '{name_escaped}')" title="Hủy kết bạn">Hủy</button>
+                        <a href="/u/{id}" class="btn btn-outline" style="flex: 1; font-size: 0.82rem; padding: 0.38rem 0.6rem; text-align: center;">View Profile</a>
+                        <button type="button" class="btn-danger-subtle" onclick="handleRemoveFriend({id}, '{name_escaped}')" title="Remove friend">Remove</button>
                     </div>
                 </div>
                 "###,
@@ -2517,7 +2517,7 @@ pub async fn friends_page(
 
     let html = crate::server::templates::render_page(
         "friends",
-        "Bạn Bè",
+        "Friends",
         &state.config.server.name,
         &navbar,
         &footer,
@@ -2576,7 +2576,7 @@ pub async fn add_friend_api(
                         StatusCode::NOT_FOUND,
                         Json(ApiResponse {
                             success: false,
-                            message: format!("Không tìm thấy người chơi '{}'.", q_trimmed),
+                            message: format!("Player '{}' not found.", q_trimmed),
                         }),
                     ).into_response();
                 }
@@ -2587,7 +2587,7 @@ pub async fn add_friend_api(
             StatusCode::BAD_REQUEST,
             Json(ApiResponse {
                 success: false,
-                message: "Thiếu thông tin người chơi cần kết bạn.".to_string(),
+                message: "Missing target player information.".to_string(),
             }),
         ).into_response();
     };
@@ -2597,7 +2597,7 @@ pub async fn add_friend_api(
             StatusCode::BAD_REQUEST,
             Json(ApiResponse {
                 success: false,
-                message: "Bạn không thể tự kết bạn với chính mình!".to_string(),
+                message: "You cannot add yourself as a friend!".to_string(),
             }),
         ).into_response();
     }
@@ -2608,9 +2608,9 @@ pub async fn add_friend_api(
                 .await
                 .unwrap_or(false);
             let msg = if is_mutual {
-                "Đã trở thành bạn bè hai chiều (Mutual)!"
+                "Mutual friend established!"
             } else {
-                "Đã thêm bạn bè thành công!"
+                "Friend added successfully!"
             };
             (StatusCode::OK, Json(serde_json::json!({
                 "success": true,
@@ -2622,7 +2622,7 @@ pub async fn add_friend_api(
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(ApiResponse {
                 success: false,
-                message: "Không thể kết bạn, vui lòng thử lại sau.".to_string(),
+                message: "Could not add friend, please try again later.".to_string(),
             }),
         ).into_response()
     }
@@ -2645,7 +2645,7 @@ pub async fn remove_friend_api(
                 StatusCode::BAD_REQUEST,
                 Json(ApiResponse {
                     success: false,
-                    message: "Thiếu ID người chơi cần hủy kết bạn.".to_string(),
+                    message: "Missing target player ID.".to_string(),
                 }),
             ).into_response();
         }
@@ -2654,13 +2654,13 @@ pub async fn remove_friend_api(
     match crate::db::friends::remove_friend(&state.friends_db, user.id, target_id).await {
         Ok(_) => (StatusCode::OK, Json(ApiResponse {
             success: true,
-            message: "Đã hủy kết bạn thành công.".to_string(),
+            message: "Friend removed successfully.".to_string(),
         })).into_response(),
         Err(_) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(ApiResponse {
                 success: false,
-                message: "Không thể hủy kết bạn, vui lòng thử lại.".to_string(),
+                message: "Could not remove friend, please try again.".to_string(),
             }),
         ).into_response(),
     }

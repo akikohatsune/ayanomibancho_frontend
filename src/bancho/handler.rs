@@ -620,7 +620,7 @@ pub async fn handle_client_packets(
                         };
 
                         if should_warn {
-                            let warn_text = "Lưu ý bảo mật: Không được gửi mật khẩu cho bất kì ai! Admin/Staff/Bot sẽ không bao giờ hỏi bạn về mật khẩu.";
+                            let warn_text = "Security Notice: Never share your password with anyone! Admin/Staff/Bot will never ask for your password.";
                             
                             // Send security warning to sender
                             let warn_sender_msg = ChatMessage {

@@ -94,7 +94,7 @@ pub async fn handle_bot_command(
                 } else {
                     return Some(build_send_message(&ChatMessage {
                         sender: bot_name.to_string(),
-                        content: "Không tìm thấy phiên làm việc của bạn.".to_string(),
+                        content: "Your session could not be found.".to_string(),
                         target: reply_target.to_string(),
                         sender_id: bot_id,
                     }));
@@ -137,12 +137,12 @@ pub async fn handle_bot_command(
 
             if new_state {
                 format!(
-                    "Relax mode: BẬT [ON] cho {}. Bảng điểm và xếp hạng bây giờ sẽ tính riêng cho Relax (RX)! PP: {} | Rank: #{}",
+                    "Relax mode: ENABLED [ON] for {}. Scores and ranking are now tracked for Relax (RX)! PP: {} | Rank: #{}",
                     mode_name, db_stats.pp, rank
                 )
             } else {
                 format!(
-                    "Relax mode: TẮT [OFF] cho {}. Trở về chế độ Standard/Vanilla bình thường! PP: {} | Rank: #{}",
+                    "Relax mode: DISABLED [OFF] for {}. Returned to Standard/Vanilla mode! PP: {} | Rank: #{}",
                     mode_name, db_stats.pp, rank
                 )
             }
@@ -269,7 +269,7 @@ pub async fn handle_bot_command(
             if target_channel.starts_with('#') {
                 if let Ok(history) = crate::db::chat::get_channel_history(chat_db, target_channel, limit).await {
                     if history.is_empty() {
-                        format!("Không có tin nhắn cũ nào trong kênh {}.", target_channel)
+                        format!("No previous messages in channel {}.", target_channel)
                     } else {
                         // Enqueue old messages to user's session
                         let mut packets = Vec::new();
@@ -285,7 +285,7 @@ pub async fn handle_bot_command(
 
                         let notice = ChatMessage {
                             sender: bot_name.to_string(),
-                            content: format!("Đã tải lại {} tin nhắn gần nhất của kênh {}.", history.len(), target_channel),
+                            content: format!("Reloaded {} recent messages from channel {}.", history.len(), target_channel),
                             target: target_channel.to_string(),
                             sender_id: bot_id,
                         };
@@ -293,13 +293,13 @@ pub async fn handle_bot_command(
                         return Some(packets);
                     }
                 } else {
-                    "Không thể truy xuất lịch sử trò chuyện lúc này.".to_string()
+                    "Unable to retrieve chat history at this time.".to_string()
                 }
             } else {
                 // Direct message history
                 if let Ok(history) = crate::db::chat::get_direct_messages(chat_db, sender_username, target_channel, limit).await {
                     if history.is_empty() {
-                        format!("Không có tin nhắn riêng nào giữa bạn và {}.", target_channel)
+                        format!("No direct messages found between you and {}.", target_channel)
                     } else {
                         let mut packets = Vec::new();
                         for msg in &history {
@@ -314,7 +314,7 @@ pub async fn handle_bot_command(
 
                         let notice = ChatMessage {
                             sender: bot_name.to_string(),
-                            content: format!("Đã tải lại {} tin nhắn riêng gần nhất.", history.len()),
+                            content: format!("Reloaded {} recent direct messages.", history.len()),
                             target: reply_target.to_string(),
                             sender_id: bot_id,
                         };
@@ -322,7 +322,7 @@ pub async fn handle_bot_command(
                         return Some(packets);
                     }
                 } else {
-                    "Không thể truy xuất lịch sử tin nhắn riêng.".to_string()
+                    "Unable to retrieve direct message history.".to_string()
                 }
             }
         }

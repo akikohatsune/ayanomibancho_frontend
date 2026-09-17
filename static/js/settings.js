@@ -28,7 +28,7 @@ async function handleSettingsAvatarUpload(e) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) {
-        showSettingsToast('Ảnh đại diện không được vượt quá 5MB!', true);
+        showSettingsToast('Avatar file size must not exceed 5MB!', true);
         return;
     }
     const formData = new FormData();
@@ -46,18 +46,18 @@ async function handleSettingsAvatarUpload(e) {
             document.querySelectorAll('.nav-avatar-img').forEach(img => {
                 img.src = img.src.split('?')[0] + '?v=' + timestamp;
             });
-            showSettingsToast(res.message || 'Cập nhật ảnh đại diện thành công!');
+            showSettingsToast(res.message || 'Avatar updated successfully!');
         } else {
-            showSettingsToast(res.message || 'Lỗi khi cập nhật ảnh đại diện.', true);
+            showSettingsToast(res.message || 'Failed to update avatar.', true);
         }
     } catch (_) {
-        showSettingsToast('Lỗi mạng khi tải ảnh lên.', true);
+        showSettingsToast('Network error while uploading avatar.', true);
     }
 }
 
 // Avatar reset
 async function handleSettingsAvatarReset() {
-    if (!confirm('Bạn có chắc muốn đặt lại ảnh đại diện về mặc định?')) return;
+    if (!confirm('Are you sure you want to reset your avatar to default?')) return;
     try {
         const resp = await fetch('/api/profile/avatar/reset', { method: 'POST' });
         const res = await resp.json();
@@ -68,12 +68,12 @@ async function handleSettingsAvatarReset() {
             document.querySelectorAll('.nav-avatar-img').forEach(img => {
                 img.src = img.src.split('?')[0] + '?v=' + timestamp;
             });
-            showSettingsToast(res.message || 'Đã đặt lại ảnh đại diện mặc định!');
+            showSettingsToast(res.message || 'Avatar reset to default!');
         } else {
-            showSettingsToast(res.message || 'Không thể đặt lại ảnh đại diện.', true);
+            showSettingsToast(res.message || 'Could not reset avatar.', true);
         }
     } catch (_) {
-        showSettingsToast('Lỗi mạng khi thực hiện thao tác.', true);
+        showSettingsToast('Network error while resetting avatar.', true);
     }
 }
 
@@ -82,7 +82,7 @@ async function handleSettingsBannerUpload(e) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
-        showSettingsToast('Ảnh bìa không được vượt quá 10MB!', true);
+        showSettingsToast('Banner file size must not exceed 10MB!', true);
         return;
     }
     const formData = new FormData();
@@ -99,18 +99,18 @@ async function handleSettingsBannerUpload(e) {
             if (bannerPreview) {
                 bannerPreview.style.backgroundImage = `url('/banner/?v=${timestamp}')`;
             }
-            showSettingsToast(res.message || 'Cập nhật ảnh bìa thành công!');
+            showSettingsToast(res.message || 'Banner updated successfully!');
         } else {
-            showSettingsToast(res.message || 'Lỗi khi tải ảnh bìa.', true);
+            showSettingsToast(res.message || 'Failed to upload banner.', true);
         }
     } catch (_) {
-        showSettingsToast('Lỗi mạng khi tải ảnh lên.', true);
+        showSettingsToast('Network error while uploading banner.', true);
     }
 }
 
 // Banner reset
 async function handleSettingsBannerReset() {
-    if (!confirm('Bạn có chắc muốn đặt lại ảnh bìa về mặc định?')) return;
+    if (!confirm('Are you sure you want to reset your banner to default?')) return;
     try {
         const resp = await fetch('/api/profile/banner/reset', { method: 'POST' });
         const res = await resp.json();
@@ -120,12 +120,12 @@ async function handleSettingsBannerReset() {
             if (bannerPreview) {
                 bannerPreview.style.backgroundImage = `url('/banner/0?v=${timestamp}')`;
             }
-            showSettingsToast(res.message || 'Đã đặt lại ảnh bìa mặc định!');
+            showSettingsToast(res.message || 'Banner reset to default!');
         } else {
-            showSettingsToast(res.message || 'Không thể đặt lại ảnh bìa.', true);
+            showSettingsToast(res.message || 'Could not reset banner.', true);
         }
     } catch (_) {
-        showSettingsToast('Lỗi mạng khi thực hiện thao tác.', true);
+        showSettingsToast('Network error while resetting banner.', true);
     }
 }
 
@@ -168,18 +168,18 @@ async function saveSettingsCountry() {
             document.querySelectorAll('.nav-flag-box').forEach(box => {
                 box.innerHTML = getSettingsFlagSvg(code, 24, 16);
             });
-            showSettingsToast('Đã lưu quốc gia thành công!');
+            showSettingsToast('Country saved successfully!');
         } else {
-            showSettingsToast(res.message || 'Lỗi khi lưu quốc gia.', true);
+            showSettingsToast(res.message || 'Failed to save country.', true);
         }
     } catch (_) {
-        showSettingsToast('Lỗi kết nối khi cập nhật.', true);
+        showSettingsToast('Connection error while updating.', true);
     }
 }
 
 function quickClientMarkdown(raw) {
     if (!raw || !raw.trim()) {
-        return '<i style="color: var(--text-muted);">Không có nội dung để hiển thị.</i>';
+        return '<i style="color: var(--text-muted);">No content to display.</i>';
     }
     let html = raw
         .replace(/&/g, '&amp;')
@@ -287,22 +287,22 @@ function formatSettingsBio(action) {
         case 'bold':
             prefix = '**';
             suffix = '**';
-            defaultText = 'chữ đậm';
+            defaultText = 'bold text';
             break;
         case 'italic':
             prefix = '*';
             suffix = '*';
-            defaultText = 'chữ nghiêng';
+            defaultText = 'italic text';
             break;
         case 'heading':
             prefix = isAtStartOrNewline ? '### ' : '\n### ';
             suffix = '';
-            defaultText = 'Tiêu đề';
+            defaultText = 'Heading';
             break;
         case 'quote':
             prefix = isAtStartOrNewline ? '> ' : '\n> ';
             suffix = '';
-            defaultText = 'Trích dẫn';
+            defaultText = 'Quote';
             break;
         case 'code':
             if (selected.includes('\n')) {
@@ -316,23 +316,23 @@ function formatSettingsBio(action) {
             } else {
                 prefix = (isAtStartOrNewline ? '' : '\n') + '```\n';
                 suffix = '\n```\n';
-                defaultText = '// code ở đây';
+                defaultText = '// code here';
             }
             break;
         case 'link':
             prefix = '[';
             suffix = '](https://example.com)';
-            defaultText = 'Tiêu đề liên kết';
+            defaultText = 'Link title';
             break;
         case 'task':
             prefix = isAtStartOrNewline ? '- [ ] ' : '\n- [ ] ';
             suffix = '';
-            defaultText = 'Nhiệm vụ mới';
+            defaultText = 'New task';
             break;
         case 'table':
-            prefix = (isAtStartOrNewline ? '' : '\n') + '| Tiêu đề 1 | Tiêu đề 2 |\n| :--- | :--- |\n| ';
-            suffix = ' | Dữ liệu 2 |\n';
-            defaultText = 'Dữ liệu 1';
+            prefix = (isAtStartOrNewline ? '' : '\n') + '| Header 1 | Header 2 |\n| :--- | :--- |\n| ';
+            suffix = ' | Data 2 |\n';
+            defaultText = 'Data 1';
             break;
         default:
             return;
@@ -375,12 +375,12 @@ async function saveSettingsBio() {
         });
         const res = await resp.json();
         if (res.success) {
-            showSettingsToast('Đã lưu phần giới thiệu thành công!');
+            showSettingsToast('Bio saved successfully!');
         } else {
-            showSettingsToast(res.message || 'Không thể lưu giới thiệu.', true);
+            showSettingsToast(res.message || 'Could not save bio.', true);
         }
     } catch (_) {
-        showSettingsToast('Lỗi mạng khi lưu giới thiệu.', true);
+        showSettingsToast('Network error while saving bio.', true);
     }
 }
 
@@ -392,16 +392,16 @@ async function handleChangePassword(e) {
     const confPass = document.getElementById('confirmPasswordInput')?.value || '';
 
     if (newPass.length < 6) {
-        showSettingsToast('Mật khẩu mới phải có ít nhất 6 ký tự!', true);
+        showSettingsToast('New password must be at least 6 characters long!', true);
         return;
     }
     if (newPass !== confPass) {
-        showSettingsToast('Mật khẩu xác nhận không khớp!', true);
+        showSettingsToast('Confirm password does not match!', true);
         return;
     }
 
     const btn = document.getElementById('btnSubmitPassword');
-    if (btn) { btn.disabled = true; btn.innerText = 'Đang cập nhật...'; }
+    if (btn) { btn.disabled = true; btn.innerText = 'Updating...'; }
 
     try {
         const resp = await fetch('/api/settings/password', {
@@ -415,15 +415,15 @@ async function handleChangePassword(e) {
         });
         const res = await resp.json();
         if (res.success) {
-            showSettingsToast(res.message || 'Đổi mật khẩu thành công!');
+            showSettingsToast(res.message || 'Password updated successfully!');
             document.getElementById('changePasswordForm')?.reset();
         } else {
-            showSettingsToast(res.message || 'Mật khẩu hiện tại không chính xác.', true);
+            showSettingsToast(res.message || 'Current password is incorrect.', true);
         }
     } catch (_) {
-        showSettingsToast('Lỗi kết nối khi đổi mật khẩu.', true);
+        showSettingsToast('Connection error while changing password.', true);
     } finally {
-        if (btn) { btn.disabled = false; btn.innerText = 'Cập Nhật Mật Khẩu'; }
+        if (btn) { btn.disabled = false; btn.innerText = 'Update Password'; }
     }
 }
 

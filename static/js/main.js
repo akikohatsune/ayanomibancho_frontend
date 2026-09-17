@@ -33,22 +33,22 @@ document.addEventListener('click', (event) => {
 
 function openFriendsModal(event) {
     if (event) event.preventDefault();
-    alert('Tính năng Bạn Bè: Bạn có thể xem danh sách bạn bè trực tiếp qua osu! client hoặc in-game chat.');
+    alert('Friends Feature: You can view your friend list directly in the osu! client or in-game chat.');
 }
 
 function openFollowingModal(event) {
     if (event) event.preventDefault();
-    alert('Tính năng Danh Sách Theo Dõi: Đang đồng bộ hóa người chơi mà bạn đang theo dõi.');
+    alert('Following List: Synchronizing followed players.');
 }
 
 function toggleNavChat(event) {
     if (event) event.preventDefault();
-    alert('Hộp thoại trò chuyện: Kết nối kênh chat #osu trong game để giao lưu cùng mọi người!');
+    alert('Chat: Join the #osu channel in-game to chat with others!');
 }
 
 function toggleNavNotif(event) {
     if (event) event.preventDefault();
-    alert('Thông báo: Hiện không có thông báo mới nào.');
+    alert('Notifications: No new notifications at this time.');
 }
 
 function showNavQuickToast(msg) {

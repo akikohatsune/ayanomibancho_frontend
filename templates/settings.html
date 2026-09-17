@@ -2,20 +2,20 @@
     <div class="settings-header">
         <h1 class="settings-title">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            <span>Cài Đặt Tài Khoản</span>
+            <span>Account Settings</span>
         </h1>
-        <p class="settings-subtitle">Tùy chỉnh hồ sơ cá nhân, bảo mật tài khoản và giao diện trải nghiệm của bạn.</p>
+        <p class="settings-subtitle">Customize your profile, account security, and personal preferences.</p>
     </div>
 
     <!-- Navigation Tabs -->
     <div class="settings-tabs-bar">
         <button type="button" class="settings-tab-btn active" onclick="switchSettingsTab('profile', this)">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>Hồ Sơ</span>
+            <span>Profile</span>
         </button>
         <button type="button" class="settings-tab-btn" onclick="switchSettingsTab('security', this)">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <span>Tài Khoản & Bảo Mật</span>
+            <span>Account & Security</span>
         </button>
     </div>
 
@@ -23,45 +23,45 @@
     <div id="tabContentProfile" class="settings-tab-panel active">
         <!-- Avatar & Banner Section -->
         <div class="glass-card settings-card">
-            <h2 class="card-section-title">Hình ảnh nhận diện</h2>
+            <h2 class="card-section-title">Profile Media</h2>
             <div class="settings-media-grid">
                 <!-- Avatar block -->
                 <div class="media-setting-block">
-                    <div class="media-label">Ảnh đại diện (Avatar)</div>
+                    <div class="media-label">Profile Avatar</div>
                     <div class="avatar-preview-wrapper">
                         <img id="settingsAvatarPreview" src="/a/{{USER_ID}}" class="settings-avatar-img" alt="{{USERNAME}}">
                     </div>
                     <div class="media-action-buttons">
                         <label for="settingsAvatarInput" class="btn btn-primary" style="font-size: 0.86rem; padding: 0.45rem 1rem; cursor: pointer;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                            <span>Tải ảnh mới</span>
+                            <span>Upload Avatar</span>
                         </label>
                         <input type="file" id="settingsAvatarInput" accept=".png,.jpg,.jpeg,.webp" style="display: none;" onchange="handleSettingsAvatarUpload(event)">
-                        <button type="button" class="btn btn-outline" style="font-size: 0.86rem; padding: 0.45rem 0.9rem;" onclick="handleSettingsAvatarReset()">Đặt lại mặc định</button>
+                        <button type="button" class="btn btn-outline" style="font-size: 0.86rem; padding: 0.45rem 0.9rem;" onclick="handleSettingsAvatarReset()">Reset Default</button>
                     </div>
-                    <div class="media-hint">Hỗ trợ PNG, JPG, WEBP. Dung lượng tối đa 5MB.</div>
+                    <div class="media-hint">Supported formats: PNG, JPG, WEBP. Max size 5MB.</div>
                 </div>
 
                 <!-- Banner block -->
                 <div class="media-setting-block">
-                    <div class="media-label">Ảnh bìa (Profile Banner)</div>
+                    <div class="media-label">Cover Banner</div>
                     <div class="banner-preview-wrapper" style="background-image: url('/banner/{{USER_ID}}');" id="settingsBannerPreview"></div>
                     <div class="media-action-buttons">
                         <label for="settingsBannerInput" class="btn btn-primary" style="font-size: 0.86rem; padding: 0.45rem 1rem; cursor: pointer;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                            <span>Tải ảnh bìa mới</span>
+                            <span>Upload Banner</span>
                         </label>
                         <input type="file" id="settingsBannerInput" accept=".png,.jpg,.jpeg,.webp" style="display: none;" onchange="handleSettingsBannerUpload(event)">
-                        <button type="button" class="btn btn-outline" style="font-size: 0.86rem; padding: 0.45rem 0.9rem;" onclick="handleSettingsBannerReset()">Đặt lại mặc định</button>
+                        <button type="button" class="btn btn-outline" style="font-size: 0.86rem; padding: 0.45rem 0.9rem;" onclick="handleSettingsBannerReset()">Reset Default</button>
                     </div>
-                    <div class="media-hint">Khuyến nghị tỉ lệ 16:9 hoặc độ phân giải 1920x600. Tối đa 10MB.</div>
+                    <div class="media-hint">Recommended ratio 16:9 or 1920x600 resolution. Max 10MB.</div>
                 </div>
             </div>
         </div>
 
         <!-- Country Selector Section with Flag SVG -->
         <div class="glass-card settings-card">
-            <h2 class="card-section-title">Quốc gia & Khu vực</h2>
+            <h2 class="card-section-title">Country & Region</h2>
             <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                 <div id="settingsCurrentFlag" class="settings-flag-box">
                     {{COUNTRY_FLAG_SVG}}
@@ -71,37 +71,37 @@
                         {{COUNTRY_OPTIONS}}
                     </select>
                 </div>
-                <button type="button" class="btn btn-primary" onclick="saveSettingsCountry()">Lưu Quốc Gia</button>
+                <button type="button" class="btn btn-primary" onclick="saveSettingsCountry()">Save Country</button>
             </div>
         </div>
 
         <!-- About Me ("me!") Markdown Editor -->
         <div class="glass-card settings-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2 class="card-section-title" style="margin: 0;">Giới thiệu bản thân ("me!")</h2>
-                <span style="font-size: 0.85rem; color: var(--text-muted);"><span id="settingsBioCount">{{BIO_COUNT}}</span>/2000 ký tự</span>
+                <h2 class="card-section-title" style="margin: 0;">User Bio ("me!")</h2>
+                <span style="font-size: 0.85rem; color: var(--text-muted);"><span id="settingsBioCount">{{BIO_COUNT}}</span>/2000 characters</span>
             </div>
 
             <!-- Toolbar -->
             <div class="editor-toolbar">
                 <div style="display: flex; gap: 0.4rem;">
-                    <button type="button" id="bioTabWrite" class="editor-tab-btn active" onclick="setSettingsBioTab('write')">Soạn thảo</button>
-                    <button type="button" id="bioTabPreview" class="editor-tab-btn" onclick="setSettingsBioTab('preview')">Xem trước (Live Preview)</button>
+                    <button type="button" id="bioTabWrite" class="editor-tab-btn active" onclick="setSettingsBioTab('write')">Write</button>
+                    <button type="button" id="bioTabPreview" class="editor-tab-btn" onclick="setSettingsBioTab('preview')">Preview</button>
                 </div>
                 <div class="toolbar-actions">
-                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('bold')" title="Chữ đậm (Ctrl+B)"><b>B</b></button>
-                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('italic')" title="Chữ nghiêng (Ctrl+I)"><i>I</i></button>
-                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('heading')" title="Tiêu đề (H3)"><b>H</b></button>
-                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('quote')" title="Trích dẫn (Quote)"><b>&ldquo;</b></button>
-                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('code')" title="Mã nguồn (Code)"><code>&lt;&gt;</code></button>
-                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('link')" title="Chèn liên kết (Ctrl+K)"><b>Link</b></button>
-                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('task')" title="Danh sách việc (Task list)"><b>Task</b></button>
-                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('table')" title="Chèn bảng (Table)"><b>Bảng</b></button>
+                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
+                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
+                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('heading')" title="Heading (H3)"><b>H</b></button>
+                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('quote')" title="Quote"><b>&ldquo;</b></button>
+                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('code')" title="Code Block"><code>&lt;&gt;</code></button>
+                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('link')" title="Insert Link (Ctrl+K)"><b>Link</b></button>
+                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('task')" title="Task list"><b>Task</b></button>
+                    <button type="button" class="editor-fmt-btn" onmousedown="event.preventDefault()" onclick="formatSettingsBio('table')" title="Table"><b>Table</b></button>
                 </div>
             </div>
 
             <div id="settingsBioWriteArea">
-                <textarea id="settingsBioInput" class="input-glass" rows="10" maxlength="2000" placeholder="Viết vài dòng giới thiệu về bạn bằng GitHub-Flavored Markdown (hỗ trợ ảnh, bảng, căn giữa...)...">{{RAW_BIO}}</textarea>
+                <textarea id="settingsBioInput" class="input-glass" rows="10" maxlength="2000" placeholder="Write something about yourself in GitHub-Flavored Markdown (supports images, tables, formatting...)...">{{RAW_BIO}}</textarea>
             </div>
 
             <div id="settingsBioPreviewArea" class="bio-markdown" style="display: none; min-height: 200px; padding: 1.2rem; background: var(--bg-surface-hover); border: 1px solid var(--card-border); border-radius: 6px; margin-bottom: 0.8rem;">
@@ -111,7 +111,7 @@
             <div style="margin-top: 1rem;">
                 <button type="button" class="btn btn-primary" onclick="saveSettingsBio()">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                    <span>Lưu Giới Thiệu</span>
+                    <span>Save Bio</span>
                 </button>
             </div>
         </div>
@@ -121,51 +121,51 @@
     <div id="tabContentSecurity" class="settings-tab-panel">
         <!-- Change Password -->
         <div class="glass-card settings-card">
-            <h2 class="card-section-title">Đổi Mật Khẩu</h2>
+            <h2 class="card-section-title">Change Password</h2>
             <form id="changePasswordForm" onsubmit="handleChangePassword(event)" style="max-width: 480px;">
                 <div class="form-group" style="margin-bottom: 1.2rem;">
-                    <label class="form-label">Mật khẩu hiện tại</label>
-                    <input type="password" id="currentPasswordInput" required class="input-glass" style="width: 100%;" placeholder="Nhập mật khẩu bạn đang sử dụng...">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" id="currentPasswordInput" required class="input-glass" style="width: 100%;" placeholder="Enter your current password...">
                 </div>
                 <div class="form-group" style="margin-bottom: 1.2rem;">
-                    <label class="form-label">Mật khẩu mới</label>
-                    <input type="password" id="newPasswordInput" required minlength="6" class="input-glass" style="width: 100%;" placeholder="Tối thiểu 6 ký tự...">
+                    <label class="form-label">New Password</label>
+                    <input type="password" id="newPasswordInput" required minlength="6" class="input-glass" style="width: 100%;" placeholder="At least 6 characters...">
                 </div>
                 <div class="form-group" style="margin-bottom: 1.5rem;">
-                    <label class="form-label">Xác nhận mật khẩu mới</label>
-                    <input type="password" id="confirmPasswordInput" required minlength="6" class="input-glass" style="width: 100%;" placeholder="Nhập lại mật khẩu mới...">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" id="confirmPasswordInput" required minlength="6" class="input-glass" style="width: 100%;" placeholder="Confirm your new password...">
                 </div>
                 <button type="submit" id="btnSubmitPassword" class="btn btn-primary">
-                    <span>Cập Nhật Mật Khẩu</span>
+                    <span>Update Password</span>
                 </button>
             </form>
         </div>
 
         <!-- Account Info & Sessions -->
         <div class="glass-card settings-card">
-            <h2 class="card-section-title">Thông tin tài khoản</h2>
+            <h2 class="card-section-title">Account Details</h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                 <div class="info-pill-box">
-                    <div class="info-pill-title">Mã tài khoản</div>
+                    <div class="info-pill-title">User ID</div>
                     <div class="info-pill-value">#{{USER_ID}}</div>
                 </div>
                 <div class="info-pill-box">
-                    <div class="info-pill-title">Tên người chơi</div>
+                    <div class="info-pill-title">Username</div>
                     <div class="info-pill-value">{{USERNAME}}</div>
                 </div>
                 <div class="info-pill-box">
-                    <div class="info-pill-title">Trạng thái phiên</div>
-                    <div class="info-pill-value" style="color: var(--emerald);">Đang đăng nhập</div>
+                    <div class="info-pill-title">Session Status</div>
+                    <div class="info-pill-value" style="color: var(--emerald);">Active</div>
                 </div>
             </div>
 
             <div style="border-top: 1px solid var(--card-border); padding-top: 1.2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
                 <div>
-                    <div style="font-weight: 700; color: var(--text-main);">Đăng xuất thiết bị</div>
-                    <div style="font-size: 0.86rem; color: var(--text-muted);">Đăng xuất tài khoản khỏi trình duyệt này và xóa phiên làm việc hiện tại.</div>
+                    <div style="font-weight: 700; color: var(--text-main);">Device Sign Out</div>
+                    <div style="font-size: 0.86rem; color: var(--text-muted);">Sign out of your account on this browser and end the current session.</div>
                 </div>
                 <button type="button" onclick="handleLogout(event)" class="btn btn-outline" style="color: var(--rose); border-color: rgba(239,68,68,0.4);">
-                    <span>Đăng Xuất Khỏi Thiết Bị Này</span>
+                    <span>Sign Out From This Device</span>
                 </button>
             </div>
     </div>
