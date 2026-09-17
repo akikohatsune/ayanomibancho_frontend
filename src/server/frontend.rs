@@ -439,25 +439,9 @@ pub fn render_navbar(active: &str, server_name: &str, user: Option<&User>, _is_a
     let is_login = if active == "login" { "class='active'" } else { "" };
     let nav_actions = match user {
         Some(u) => {
-            let country_info = crate::utils::country::bancho_id_to_country(u.country);
-            let flag_svg = crate::utils::country::country_flag_svg(country_info.code, 24, 16);
             let clean_name = crate::db::badges::clean_username(&u.username);
             format!(
                 r###"<div class="nav-actions-user">
-                    <a href="/connect" class="nav-top-icon-btn heart-btn" title="Ủng hộ máy chủ / Supporter">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="#f43f5e"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                    </a>
-                    <div class="nav-flag-box" title="{country_name}">
-                        {flag_svg}
-                    </div>
-                    <button type="button" class="nav-pill-btn" title="Trò chuyện" onclick="toggleNavChat(event)">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
-                        <span class="pill-dots">...</span>
-                    </button>
-                    <button type="button" class="nav-pill-btn" title="Thông báo" onclick="toggleNavNotif(event)">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-                        <span class="pill-dots">...</span>
-                    </button>
                     <div class="nav-user-dropdown-wrapper">
                         <div class="nav-avatar-btn" onclick="toggleUserDropdown(event)">
                             <img src="/a/{id}" class="nav-avatar-img" alt="{name}">
@@ -490,9 +474,7 @@ pub fn render_navbar(active: &str, server_name: &str, user: Option<&User>, _is_a
                     </div>
                 </div>"###,
                 id = u.id,
-                name = html_escape(clean_name),
-                country_name = html_escape(country_info.name),
-                flag_svg = flag_svg
+                name = html_escape(clean_name)
             )
         }
         None => {
