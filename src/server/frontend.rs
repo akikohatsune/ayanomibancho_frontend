@@ -460,9 +460,6 @@ pub fn render_navbar(active: &str, server_name: &str, user: Option<&User>, _is_a
                                 <a href="/friends" class="dropdown-link-row">
                                     <span>Bạn bè</span>
                                 </a>
-                                <a href="#" onclick="openFollowingModal(event)" class="dropdown-link-row">
-                                    <span>Danh sách theo dõi</span>
-                                </a>
                                 <a href="/settings" class="dropdown-link-row">
                                     <span>Cài Đặt</span>
                                 </a>
