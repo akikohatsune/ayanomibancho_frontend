@@ -429,7 +429,22 @@ pub async fn get_authenticated_user_and_admin(
     }
 }
 
-pub fn render_navbar(active: &str, server_name: &str, user: Option<&User>, _is_admin: bool) -> String {
+pub fn resolve_multi_url(domain: &str) -> String {
+    let clean_domain = domain
+        .trim()
+        .trim_start_matches("http://")
+        .trim_start_matches("https://")
+        .trim_end_matches('/');
+    let host_part = clean_domain.split(':').next().unwrap_or("127.0.0.1");
+
+    if host_part == "127.0.0.1" || host_part == "localhost" || host_part == "0.0.0.0" {
+        "http://127.0.0.1:5003/api/multi/rooms".to_string()
+    } else {
+        format!("https://roseflower.{}/api/multi/rooms", host_part)
+    }
+}
+
+pub fn render_navbar(active: &str, server_name: &str, domain: &str, user: Option<&User>, _is_admin: bool) -> String {
     let is_home = if active == "home" { "class='active'" } else { "" };
     let is_lb = if active == "leaderboard" { "class='active'" } else { "" };
     let is_multi = if active == "multi" { "class='active'" } else { "" };
@@ -481,10 +496,12 @@ pub fn render_navbar(active: &str, server_name: &str, user: Option<&User>, _is_a
         }
     };
 
+    let multi_url = resolve_multi_url(domain);
     crate::server::templates::render_template(
         "navbar",
         &[
             ("SERVER_NAME", server_name),
+            ("MULTI_URL", &multi_url),
             ("IS_HOME", is_home),
             ("IS_LB", is_lb),
             ("IS_MULTI", is_multi),
@@ -497,10 +514,14 @@ pub fn render_navbar(active: &str, server_name: &str, user: Option<&User>, _is_a
     )
 }
 
-fn render_footer(server_name: &str) -> String {
+fn render_footer(server_name: &str, domain: &str) -> String {
+    let multi_url = resolve_multi_url(domain);
     crate::server::templates::render_template(
         "footer",
-        &[("SERVER_NAME", server_name)],
+        &[
+            ("SERVER_NAME", server_name),
+            ("MULTI_URL", &multi_url),
+        ],
     )
 }
 
@@ -697,8 +718,8 @@ pub async fn index_page(
         matches_html.push_str("</tbody></table></div>");
     }
 
-    let navbar = render_navbar("home", &state.config.server.name, current_user.as_ref(), is_admin);
-    let footer = render_footer(&state.config.server.name);
+    let navbar = render_navbar("home", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), is_admin);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
 
     let online_count_str = online_count.to_string();
     let total_users_str = format_number(total_users);
@@ -814,8 +835,8 @@ pub async fn leaderboard_page(
         format!(r#"<a href="/leaderboard?m={}" class="btn {}" style="padding: 0.5rem 1.1rem;">{}</a>"#, m, active_cls, name)
     };
 
-    let navbar = render_navbar("leaderboard", &state.config.server.name, current_user.as_ref(), is_admin);
-    let footer = render_footer(&state.config.server.name);
+    let navbar = render_navbar("leaderboard", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), is_admin);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
 
     let tab_std = tab_btn(0, "Standard");
     let tab_taiko = tab_btn(1, "Taiko");
@@ -863,8 +884,8 @@ pub async fn profile_page(
                 "404",
                 "Player Not Found",
                 &state.config.server.name,
-                &render_navbar("", &state.config.server.name, current_user.as_ref(), is_admin),
-                &render_footer(&state.config.server.name),
+                &render_navbar("", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), is_admin),
+                &render_footer(&state.config.server.name, &state.config.server.domain),
                 "",
                 "",
                 &[("MESSAGE", &not_found_msg)],
@@ -1178,8 +1199,8 @@ let is_owner = current_user.as_ref().map(|u| u.id == user.id).unwrap_or(false);
     };
     let clean_name = crate::db::badges::clean_username(&user.username);
 
-    let navbar = render_navbar("", &state.config.server.name, current_user.as_ref(), is_admin);
-    let footer = render_footer(&state.config.server.name);
+    let navbar = render_navbar("", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), is_admin);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
 
         let user_id_str = user.id.to_string();
     let avatar_ver_str = avatar_ver.to_string();
@@ -1254,8 +1275,8 @@ pub async fn login_page(
     headers: HeaderMap,
 ) -> Html<String> {
     let (current_user, is_admin) = get_authenticated_user_and_admin(&state, &headers).await;
-    let navbar = render_navbar("login", &state.config.server.name, current_user.as_ref(), is_admin);
-    let footer = render_footer(&state.config.server.name);
+    let navbar = render_navbar("login", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), is_admin);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
 
     match current_user {
         Some(user) => {
@@ -1643,8 +1664,8 @@ pub async fn admin_page(
             "admin_login",
             title,
             &state.config.server.name,
-            &render_navbar("admin", &state.config.server.name, current_user.as_ref(), false),
-            &render_footer(&state.config.server.name),
+            &render_navbar("admin", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), false),
+            &render_footer(&state.config.server.name, &state.config.server.domain),
             "",
             "",
             &[
@@ -1765,8 +1786,8 @@ pub async fn admin_page(
         "admin",
         "Admin Dashboard",
         &state.config.server.name,
-        &render_navbar("admin", &state.config.server.name, current_user.as_ref(), true),
-        &render_footer(&state.config.server.name),
+        &render_navbar("admin", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), true),
+        &render_footer(&state.config.server.name, &state.config.server.domain),
         "",
         extra_js,
         &[
@@ -1795,8 +1816,8 @@ pub async fn connect_page(
     headers: HeaderMap,
 ) -> Html<String> {
     let (current_user, is_admin) = get_authenticated_user_and_admin(&state, &headers).await;
-    let navbar = render_navbar("connect", &state.config.server.name, current_user.as_ref(), is_admin);
-    let footer = render_footer(&state.config.server.name);
+    let navbar = render_navbar("connect", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), is_admin);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
 
     let extra_js = r#"<script src="/static/js/connect.js"></script>"#;
 
@@ -1826,8 +1847,8 @@ pub async fn rule_page(
     headers: HeaderMap,
 ) -> Html<String> {
     let (current_user, is_admin) = get_authenticated_user_and_admin(&state, &headers).await;
-    let navbar = render_navbar("rule", &state.config.server.name, current_user.as_ref(), is_admin);
-    let footer = render_footer(&state.config.server.name);
+    let navbar = render_navbar("rule", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), is_admin);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
 
     let html = crate::server::templates::render_page(
         "rules",
@@ -1848,8 +1869,8 @@ pub async fn changelog_page(
     headers: HeaderMap,
 ) -> Html<String> {
     let (current_user, is_admin) = get_authenticated_user_and_admin(&state, &headers).await;
-    let navbar = render_navbar("", &state.config.server.name, current_user.as_ref(), is_admin);
-    let footer = render_footer(&state.config.server.name);
+    let navbar = render_navbar("", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), is_admin);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
 
     let html = crate::server::templates::render_page(
         "changelog",
@@ -1870,8 +1891,8 @@ pub async fn staff_page(
     headers: HeaderMap,
 ) -> Html<String> {
     let (current_user, is_admin) = get_authenticated_user_and_admin(&state, &headers).await;
-    let navbar = render_navbar("staff", &state.config.server.name, current_user.as_ref(), is_admin);
-    let footer = render_footer(&state.config.server.name);
+    let navbar = render_navbar("staff", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), is_admin);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
 
     let html = crate::server::templates::render_page(
         "staff",
@@ -1927,8 +1948,9 @@ pub async fn menu_osu_handler() -> impl axum::response::IntoResponse {
 // 9. Multiplayer Live Tracking Page (GET /multi)
 // -------------------------------------------------------------------------------------------------
 
-pub async fn multi_page() -> axum::response::Redirect {
-    axum::response::Redirect::temporary("http://roseflower.127.0.0.1:5003/api/multi/rooms")
+pub async fn multi_page(State(state): State<AppState>) -> axum::response::Redirect {
+    let target = resolve_multi_url(&state.config.server.domain);
+    axum::response::Redirect::temporary(&target)
 }
 
 #[derive(Debug, Deserialize)]
@@ -2051,8 +2073,8 @@ pub async fn settings_page(
     }
 
     let rendered_bio = render_bio_markdown(&user.bio);
-    let navbar = render_navbar("settings", &state.config.server.name, Some(&user), is_admin);
-    let footer = render_footer(&state.config.server.name);
+    let navbar = render_navbar("settings", &state.config.server.name, &state.config.server.domain, Some(&user), is_admin);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
     let user_id_str = user.id.to_string();
 
     let settings_js = format!(r#"<script src="/static/js/settings.js?v={}"></script>"#, Utc::now().timestamp_millis());
@@ -2165,8 +2187,8 @@ pub async fn friends_page(
         grid_html.push_str("</div>");
     }
 
-    let navbar = render_navbar("friends", &state.config.server.name, Some(&user), is_admin);
-    let footer = render_footer(&state.config.server.name);
+    let navbar = render_navbar("friends", &state.config.server.name, &state.config.server.domain, Some(&user), is_admin);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
 
     let html = crate::server::templates::render_page(
         "friends",
