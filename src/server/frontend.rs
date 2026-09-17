@@ -444,7 +444,7 @@ pub fn resolve_multi_url(domain: &str) -> String {
     }
 }
 
-pub fn render_navbar(active: &str, server_name: &str, domain: &str, user: Option<&User>, _is_admin: bool) -> String {
+pub fn render_navbar(active: &str, server_name: &str, domain: &str, user: Option<&User>, is_admin: bool) -> String {
     let is_home = if active == "home" { "class='active'" } else { "" };
     let is_lb = if active == "leaderboard" { "class='active'" } else { "" };
     let is_multi = if active == "multi" { "class='active'" } else { "" };
@@ -455,6 +455,13 @@ pub fn render_navbar(active: &str, server_name: &str, domain: &str, user: Option
     let nav_actions = match user {
         Some(u) => {
             let clean_name = crate::db::badges::clean_username(&u.username);
+            let admin_link = if is_admin {
+                r#"<a href="/admin" class="dropdown-link-row" style="color: var(--primary); font-weight: 700;">
+                                    <span>🛡️ Admin Panel</span>
+                                </a>"#
+            } else {
+                ""
+            };
             format!(
                 r###"<div class="nav-actions-user" style="position: relative; display: flex; align-items: center;">
                     <div class="nav-user-dropdown-wrapper" style="position: relative; display: inline-block;">
@@ -478,6 +485,7 @@ pub fn render_navbar(active: &str, server_name: &str, domain: &str, user: Option
                                 <a href="/settings" class="dropdown-link-row">
                                     <span>Settings</span>
                                 </a>
+                                {admin_link}
                                 <a href="/logout" onclick="handleLogout(event)" class="dropdown-link-row logout-row">
                                     <span>Log Out</span>
                                 </a>
@@ -486,7 +494,8 @@ pub fn render_navbar(active: &str, server_name: &str, domain: &str, user: Option
                     </div>
                 </div>"###,
                 id = u.id,
-                name = html_escape(clean_name)
+                name = html_escape(clean_name),
+                admin_link = admin_link
             )
         }
         None => {
@@ -514,13 +523,19 @@ pub fn render_navbar(active: &str, server_name: &str, domain: &str, user: Option
     )
 }
 
-fn render_footer(server_name: &str, domain: &str) -> String {
+fn render_footer(server_name: &str, domain: &str, is_admin: bool) -> String {
     let multi_url = resolve_multi_url(domain);
+    let admin_link = if is_admin {
+        r#"<a href="/admin" style="color: var(--text-sub); font-size: 0.85rem;">Admin Panel</a>"#
+    } else {
+        ""
+    };
     crate::server::templates::render_template(
         "footer",
         &[
             ("SERVER_NAME", server_name),
             ("MULTI_URL", &multi_url),
+            ("ADMIN_LINK", admin_link),
         ],
     )
 }
@@ -719,7 +734,7 @@ pub async fn index_page(
     }
 
     let navbar = render_navbar("home", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), is_admin);
-    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain, is_admin);
 
     let online_count_str = online_count.to_string();
     let total_users_str = format_number(total_users);
@@ -836,7 +851,7 @@ pub async fn leaderboard_page(
     };
 
     let navbar = render_navbar("leaderboard", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), is_admin);
-    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain, is_admin);
 
     let tab_std = tab_btn(0, "Standard");
     let tab_taiko = tab_btn(1, "Taiko");
@@ -885,7 +900,7 @@ pub async fn profile_page(
                 "Player Not Found",
                 &state.config.server.name,
                 &render_navbar("", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), is_admin),
-                &render_footer(&state.config.server.name, &state.config.server.domain),
+                &render_footer(&state.config.server.name, &state.config.server.domain, is_admin),
                 "",
                 "",
                 &[("MESSAGE", &not_found_msg)],
@@ -1200,7 +1215,7 @@ let is_owner = current_user.as_ref().map(|u| u.id == user.id).unwrap_or(false);
     let clean_name = crate::db::badges::clean_username(&user.username);
 
     let navbar = render_navbar("", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), is_admin);
-    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain, is_admin);
 
         let user_id_str = user.id.to_string();
     let avatar_ver_str = avatar_ver.to_string();
@@ -1276,7 +1291,7 @@ pub async fn login_page(
 ) -> Html<String> {
     let (current_user, is_admin) = get_authenticated_user_and_admin(&state, &headers).await;
     let navbar = render_navbar("login", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), is_admin);
-    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain, is_admin);
 
     match current_user {
         Some(user) => {
@@ -1665,7 +1680,7 @@ pub async fn admin_page(
             title,
             &state.config.server.name,
             &render_navbar("admin", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), false),
-            &render_footer(&state.config.server.name, &state.config.server.domain),
+            &render_footer(&state.config.server.name, &state.config.server.domain, false),
             "",
             "",
             &[
@@ -1776,7 +1791,15 @@ pub async fn admin_page(
     let db_size_str = format_number(db_size as i64);
     let chat_db_size_str = format_number(chat_db_size as i64);
     let badges_db_size_str = format_number(badges_db_size as i64);
-    let uptime_str = format!("{}m", uptime_sec / 60);
+    let days = uptime_sec / 86400;
+    let hours = (uptime_sec % 86400) / 3600;
+    let minutes = (uptime_sec % 3600) / 60;
+    let seconds = uptime_sec % 60;
+    let uptime_str = if days > 0 {
+        format!("{}d {}h {}m {}s", days, hours, minutes, seconds)
+    } else {
+        format!("{}h {}m {}s", hours, minutes, seconds)
+    };
     let ratelimit_blocked_str = format_number(ratelimit_blocked as i64);
     let ratelimit_ips_str = format_number(ratelimit_ips as i64);
 
@@ -1787,7 +1810,7 @@ pub async fn admin_page(
         "Admin Dashboard",
         &state.config.server.name,
         &render_navbar("admin", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), true),
-        &render_footer(&state.config.server.name, &state.config.server.domain),
+        &render_footer(&state.config.server.name, &state.config.server.domain, true),
         "",
         extra_js,
         &[
@@ -1817,7 +1840,7 @@ pub async fn connect_page(
 ) -> Html<String> {
     let (current_user, is_admin) = get_authenticated_user_and_admin(&state, &headers).await;
     let navbar = render_navbar("connect", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), is_admin);
-    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain, is_admin);
 
     let extra_js = r#"<script src="/static/js/connect.js"></script>"#;
 
@@ -1848,7 +1871,7 @@ pub async fn rule_page(
 ) -> Html<String> {
     let (current_user, is_admin) = get_authenticated_user_and_admin(&state, &headers).await;
     let navbar = render_navbar("rule", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), is_admin);
-    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain, is_admin);
 
     let html = crate::server::templates::render_page(
         "rules",
@@ -1870,7 +1893,7 @@ pub async fn changelog_page(
 ) -> Html<String> {
     let (current_user, is_admin) = get_authenticated_user_and_admin(&state, &headers).await;
     let navbar = render_navbar("", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), is_admin);
-    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain, is_admin);
 
     let html = crate::server::templates::render_page(
         "changelog",
@@ -1892,7 +1915,7 @@ pub async fn staff_page(
 ) -> Html<String> {
     let (current_user, is_admin) = get_authenticated_user_and_admin(&state, &headers).await;
     let navbar = render_navbar("staff", &state.config.server.name, &state.config.server.domain, current_user.as_ref(), is_admin);
-    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain, is_admin);
 
     let html = crate::server::templates::render_page(
         "staff",
@@ -2074,7 +2097,7 @@ pub async fn settings_page(
 
     let rendered_bio = render_bio_markdown(&user.bio);
     let navbar = render_navbar("settings", &state.config.server.name, &state.config.server.domain, Some(&user), is_admin);
-    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain, is_admin);
     let user_id_str = user.id.to_string();
 
     let settings_js = format!(r#"<script src="/static/js/settings.js?v={}"></script>"#, Utc::now().timestamp_millis());
@@ -2188,7 +2211,7 @@ pub async fn friends_page(
     }
 
     let navbar = render_navbar("friends", &state.config.server.name, &state.config.server.domain, Some(&user), is_admin);
-    let footer = render_footer(&state.config.server.name, &state.config.server.domain);
+    let footer = render_footer(&state.config.server.name, &state.config.server.domain, is_admin);
 
     let html = crate::server::templates::render_page(
         "friends",
@@ -2343,7 +2366,7 @@ pub async fn remove_friend_api(
 
 #[cfg(test)]
 mod markdown_tests {
-    use super::render_bio_markdown;
+    use super::*;
 
     #[test]
     fn github_style_bio_is_rendered_and_sanitized() {
@@ -2387,5 +2410,61 @@ mod markdown_tests {
         assert!(!rendered.contains("javascript:"));
         assert!(!rendered.contains("onerror"));
         assert!(!rendered.contains("{{FOOTER}}"));
+    }
+
+    #[test]
+    fn test_footer_admin_link_visibility() {
+        let footer_non_admin = render_footer("AyanomiBancho", "hatsuneakiko.io.vn", false);
+        assert!(!footer_non_admin.contains("/admin"));
+        assert!(!footer_non_admin.contains("Admin Panel"));
+
+        let footer_admin = render_footer("AyanomiBancho", "hatsuneakiko.io.vn", true);
+        assert!(footer_admin.contains(r#"<a href="/admin""#));
+        assert!(footer_admin.contains("Admin Panel"));
+    }
+
+    #[test]
+    fn test_navbar_admin_dropdown_visibility() {
+        let dummy_user = crate::db::users::User {
+            id: 1,
+            username: "AdminUser".to_string(),
+            password_hash: "hash".to_string(),
+            email: "admin@test.local".to_string(),
+            privileges: 1,
+            country: 1,
+            bio: String::new(),
+            created_at: 0,
+        };
+
+        let nav_non_admin = render_navbar("home", "AyanomiBancho", "hatsuneakiko.io.vn", Some(&dummy_user), false);
+        assert!(!nav_non_admin.contains("/admin"));
+        assert!(!nav_non_admin.contains("Admin Panel"));
+
+        let nav_admin = render_navbar("home", "AyanomiBancho", "hatsuneakiko.io.vn", Some(&dummy_user), true);
+        assert!(nav_admin.contains(r#"href="/admin""#));
+        assert!(nav_admin.contains("Admin Panel"));
+
+        let nav_guest = render_navbar("home", "AyanomiBancho", "hatsuneakiko.io.vn", None, false);
+        assert!(!nav_guest.contains("/admin"));
+    }
+
+    #[test]
+    fn test_uptime_formatting_with_hours_and_seconds() {
+        let format_uptime = |uptime_sec: u64| -> String {
+            let days = uptime_sec / 86400;
+            let hours = (uptime_sec % 86400) / 3600;
+            let minutes = (uptime_sec % 3600) / 60;
+            let seconds = uptime_sec % 60;
+            if days > 0 {
+                format!("{}d {}h {}m {}s", days, hours, minutes, seconds)
+            } else {
+                format!("{}h {}m {}s", hours, minutes, seconds)
+            }
+        };
+
+        assert_eq!(format_uptime(0), "0h 0m 0s");
+        assert_eq!(format_uptime(24 * 60 + 15), "0h 24m 15s");
+        assert_eq!(format_uptime(3600 * 2 + 60 * 10 + 5), "2h 10m 5s");
+        assert_eq!(format_uptime(86400 + 3600 * 3 + 60 * 5 + 42), "1d 3h 5m 42s");
     }
 }

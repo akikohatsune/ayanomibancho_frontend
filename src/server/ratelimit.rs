@@ -372,8 +372,9 @@ mod tests {
         let chat_db = crate::db::chat::init_chat_db(tmp.join("chat.db").to_str().unwrap()).await.unwrap();
         let badges_db = crate::db::badges::init_badges_db(tmp.join("badges.db").to_str().unwrap()).await.unwrap();
         let multi_db = crate::db::multi::init_multi_db(tmp.join("multi.db").to_str().unwrap()).await.unwrap();
+        let friends_db = crate::db::friends::init_friends_db(tmp.join("friends.db").to_str().unwrap()).await.unwrap();
 
-        let state = AppState::new(main_db, chat_db, badges_db, multi_db, config);
+        let state = AppState::new(main_db, chat_db, badges_db, multi_db, friends_db, config);
 
         let empty_headers = axum::http::HeaderMap::new();
 
