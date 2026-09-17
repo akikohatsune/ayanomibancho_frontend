@@ -1,0 +1,57 @@
+# AyanomiBancho Frontend Configuration
+
+[server]
+host = "127.0.0.1"
+port = 5000
+bancho_port = 5001
+web_port = 5002
+domain = "hatsuneakiko.io.vn"
+name = "AyanomiBancho"
+welcome_message = "Welcome to AyanomiBancho! Enjoy your stay."
+secret_key = "56083169a803a7f4c8a54336de823f8de237d58d3a3121e7cb4117bc54c7faa6"
+
+[gameplay]
+auto_register = true
+default_country = 233
+bot_name = "Miku"
+bot_id = 999
+
+[security]
+anti_multiaccount = false
+max_accounts_per_hwid = 3
+block_vpn = false
+
+[database]
+path = "../data/ayanomi.db"
+chat_path = "../data/ayanomi_chat.db"
+badges_path = "../data/ayanomi_badges.db"
+multi_path = "../data/roseflower.db"
+friends_path = "../data/ayanomi_friends.db"
+auto_backup = false
+backup_interval_minutes = 60
+max_backups_kept = 5
+
+[mirrors]
+direct_search_api = "https://mirror.hinamizawa.ai/api/v1/hinai/search"
+download_url = "https://mirror.hinamizawa.ai/api/v1/hinai/d/{}"
+beatmap_md5_api = "https://mirror.hinamizawa.ai/v3/osu/beatmaps/md5/{}"
+
+[menu_backgrounds]
+enabled = true
+directory = "../data/backgrounds"
+artist_name = "AyanomiBancho"
+
+[ratelimit]
+enabled = true
+general_rpm = 3600
+bancho_rpm = 3600
+direct_rpm = 1800
+sensitive_rpm = 180
+whitelist_private = true
+
+[turnstile]
+enabled = true
+site_key = "0x4AAAAAAEtvk0dbaHJLPHIb"
+secret_key = "0x4AAAAAAEtvk4Yw54EI2Y8Juk4BPWe21n8"
+expected_action = "login"
+expected_hostnames = ["hatsuneakiko.io.vn", "localhost", "127.0.0.1"]

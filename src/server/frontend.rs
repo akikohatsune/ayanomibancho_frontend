@@ -456,17 +456,17 @@ pub fn render_navbar(active: &str, server_name: &str, domain: &str, user: Option
         Some(u) => {
             let clean_name = crate::db::badges::clean_username(&u.username);
             format!(
-                r###"<div class="nav-actions-user">
-                    <div class="nav-user-dropdown-wrapper">
-                        <div class="nav-avatar-btn" onclick="toggleUserDropdown(event)">
-                            <img src="/a/{id}" class="nav-avatar-img" alt="{name}">
+                r###"<div class="nav-actions-user" style="position: relative; display: flex; align-items: center;">
+                    <div class="nav-user-dropdown-wrapper" style="position: relative; display: inline-block;">
+                        <div class="nav-avatar-btn" onclick="toggleUserDropdown(event)" style="cursor: pointer; width: 40px; height: 40px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255, 255, 255, 0.2);">
+                            <img src="/a/{id}" class="nav-avatar-img" alt="{name}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; display: block;">
                         </div>
-                        <div class="user-dropdown-card" id="userDropdownMenu">
-                            <div class="dropdown-header-banner" style="background-image: linear-gradient(180deg, rgba(15,23,42,0.15) 0%, rgba(15,23,42,0.85) 100%), url('/banner/{id}');">
-                                <a href="/u/{id}" class="dropdown-avatar-wrapper" title="{name}'s Profile">
-                                    <img src="/a/{id}" class="dropdown-header-avatar nav-avatar-img" alt="{name}">
+                        <div class="user-dropdown-card" id="userDropdownMenu" style="display: none; position: absolute; top: calc(100% + 14px); right: 0; width: 270px; background: #1c2028; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7); z-index: 1100; overflow: hidden;">
+                            <div class="dropdown-header-banner" style="height: 130px; background-size: cover; background-position: center; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1rem; box-sizing: border-box; background-image: linear-gradient(180deg, rgba(15,23,42,0.15) 0%, rgba(15,23,42,0.85) 100%), url('/banner/{id}');">
+                                <a href="/u/{id}" class="dropdown-avatar-wrapper" title="{name}'s Profile" style="display: inline-block; line-height: 0;">
+                                    <img src="/a/{id}" class="dropdown-header-avatar nav-avatar-img" alt="{name}" style="width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(224, 85, 142, 0.8);">
                                 </a>
-                                <a href="/u/{id}" class="dropdown-username">{name}</a>
+                                <a href="/u/{id}" class="dropdown-username" style="color: #f1f5f9; font-weight: 800; font-size: 1rem; margin-top: 0.5rem; text-decoration: none;">{name}</a>
                             </div>
                             <div class="dropdown-menu-links">
                                 <a href="/u/{id}" class="dropdown-link-row">

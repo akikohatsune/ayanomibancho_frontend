@@ -14,7 +14,14 @@ function toggleUserDropdown(event) {
     if (event) event.stopPropagation();
     const menu = document.getElementById('userDropdownMenu');
     if (menu) {
-        menu.classList.toggle('show');
+        const isShown = menu.classList.contains('show') || menu.style.display === 'block';
+        if (isShown) {
+            menu.classList.remove('show');
+            menu.style.display = 'none';
+        } else {
+            menu.classList.add('show');
+            menu.style.display = 'block';
+        }
     }
 }
 
@@ -22,9 +29,10 @@ function toggleUserDropdown(event) {
 document.addEventListener('click', (event) => {
     const dropdown = document.getElementById('userDropdownMenu');
     const avatarBtn = document.querySelector('.nav-avatar-btn');
-    if (dropdown && dropdown.classList.contains('show')) {
+    if (dropdown) {
         if (!dropdown.contains(event.target) && !avatarBtn?.contains(event.target)) {
             dropdown.classList.remove('show');
+            dropdown.style.display = 'none';
         }
     }
 });
