@@ -17,10 +17,6 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             <span>Tài Khoản & Bảo Mật</span>
         </button>
-        <button type="button" class="settings-tab-btn" onclick="switchSettingsTab('appearance', this)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-            <span>Giao Diện & Âm Thanh</span>
-        </button>
     </div>
 
     <!-- Tab 1: Profile -->
@@ -172,47 +168,6 @@
                     <span>Đăng Xuất Khỏi Thiết Bị Này</span>
                 </button>
             </div>
-        </div>
-    </div>
-
-    <!-- Tab 3: Appearance & Sounds -->
-    <div id="tabContentAppearance" class="settings-tab-panel">
-        <div class="glass-card settings-card">
-            <h2 class="card-section-title">Chủ đề giao diện (Theme)</h2>
-            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.2rem;">Chọn giao diện màu sắc ưa thích của bạn cho toàn bộ trang web AyanomiBancho.</p>
-            <div class="theme-picker-grid">
-                <div class="theme-card active" onclick="selectTheme('dark', this)">
-                    <div class="theme-color-preview" style="background: #11141a; border: 2px solid #e0558e;"></div>
-                    <div class="theme-name">Dark Mode (Mặc định)</div>
-                </div>
-                <div class="theme-card" onclick="selectTheme('dim', this)">
-                    <div class="theme-color-preview" style="background: #0f172a; border: 2px solid #38bdf8;"></div>
-                    <div class="theme-name">Midnight Dim</div>
-                </div>
-                <div class="theme-card" onclick="selectTheme('cyberpunk', this)">
-                    <div class="theme-color-preview" style="background: #180520; border: 2px solid #f43f5e;"></div>
-                    <div class="theme-name">Cyberpunk Pink</div>
-                </div>
-                <div class="theme-card" onclick="selectTheme('slate', this)">
-                    <div class="theme-color-preview" style="background: #0b1120; border: 2px solid #6366f1;"></div>
-                    <div class="theme-name">Deep Slate</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="glass-card settings-card">
-            <h2 class="card-section-title">Hiệu ứng âm thanh (Audio Effects)</h2>
-            <div class="setting-toggle-row">
-                <div>
-                    <div class="toggle-row-title">Âm thanh click & hover osu!</div>
-                    <div class="toggle-row-desc">Phát hiệu ứng âm thanh click nút và tương tác menu chuẩn phong cách osu!.</div>
-                </div>
-                <label class="switch-control">
-                    <input type="checkbox" id="prefSoundEffects" onchange="toggleSoundPref(this.checked)">
-                    <span class="switch-slider"></span>
-                </label>
-            </div>
-        </div>
     </div>
 </div>
 

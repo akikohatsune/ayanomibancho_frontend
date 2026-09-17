@@ -20,8 +20,6 @@ function switchSettingsTab(tabId, btn) {
         document.getElementById('tabContentProfile')?.classList.add('active');
     } else if (tabId === 'security') {
         document.getElementById('tabContentSecurity')?.classList.add('active');
-    } else if (tabId === 'appearance') {
-        document.getElementById('tabContentAppearance')?.classList.add('active');
     }
 }
 
@@ -429,20 +427,6 @@ async function handleChangePassword(e) {
     }
 }
 
-// Appearance Theme
-function selectTheme(theme, el) {
-    document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
-    if (el) el.classList.add('active');
-    localStorage.setItem('ayanomi_theme', theme);
-    document.body.dataset.theme = theme;
-    showSettingsToast(`Đã áp dụng chủ đề: ${theme}`);
-}
-
-function toggleSoundPref(checked) {
-    localStorage.setItem('ayanomi_sounds', checked ? 'true' : 'false');
-    showSettingsToast(checked ? 'Đã bật âm thanh giao diện!' : 'Đã tắt âm thanh giao diện.');
-}
-
 // On page load
 document.addEventListener('DOMContentLoaded', () => {
     const textarea = document.getElementById('settingsBioInput');
@@ -467,16 +451,5 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-    }
-
-    const savedTheme = localStorage.getItem('ayanomi_theme') || 'dark';
-    document.querySelectorAll('.theme-card').forEach(c => {
-        if (c.getAttribute('onclick')?.includes(savedTheme)) c.classList.add('active');
-        else c.classList.remove('active');
-    });
-
-    const soundBox = document.getElementById('prefSoundEffects');
-    if (soundBox) {
-        soundBox.checked = localStorage.getItem('ayanomi_sounds') !== 'false';
     }
 });
