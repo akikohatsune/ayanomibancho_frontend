@@ -444,6 +444,21 @@ pub fn resolve_multi_url(domain: &str) -> String {
     }
 }
 
+pub fn resolve_status_url(domain: &str) -> String {
+    let clean_domain = domain
+        .trim()
+        .trim_start_matches("http://")
+        .trim_start_matches("https://")
+        .trim_end_matches('/');
+    let host_part = clean_domain.split(':').next().unwrap_or("127.0.0.1");
+
+    if host_part == "127.0.0.1" || host_part == "localhost" || host_part == "0.0.0.0" {
+        "https://status.hatsuneakiko.io.vn/".to_string()
+    } else {
+        format!("https://status.{}/", host_part)
+    }
+}
+
 pub fn render_navbar(active: &str, server_name: &str, domain: &str, user: Option<&User>, is_admin: bool) -> String {
     let is_home = if active == "home" { "class='active'" } else { "" };
     let is_lb = if active == "leaderboard" { "class='active'" } else { "" };
@@ -525,6 +540,7 @@ pub fn render_navbar(active: &str, server_name: &str, domain: &str, user: Option
 
 fn render_footer(server_name: &str, domain: &str, is_admin: bool) -> String {
     let multi_url = resolve_multi_url(domain);
+    let status_url = resolve_status_url(domain);
     let admin_link = if is_admin {
         r#"<a href="/admin" style="color: var(--text-sub); font-size: 0.85rem;">Admin Panel</a>"#
     } else {
@@ -535,6 +551,7 @@ fn render_footer(server_name: &str, domain: &str, is_admin: bool) -> String {
         &[
             ("SERVER_NAME", server_name),
             ("MULTI_URL", &multi_url),
+            ("STATUS_URL", &status_url),
             ("ADMIN_LINK", admin_link),
         ],
     )
@@ -2417,10 +2434,13 @@ mod markdown_tests {
         let footer_non_admin = render_footer("AyanomiBancho", "hatsuneakiko.io.vn", false);
         assert!(!footer_non_admin.contains("/admin"));
         assert!(!footer_non_admin.contains("Admin Panel"));
+        assert!(footer_non_admin.contains("https://status.hatsuneakiko.io.vn/"));
+        assert!(footer_non_admin.contains("Status"));
 
         let footer_admin = render_footer("AyanomiBancho", "hatsuneakiko.io.vn", true);
         assert!(footer_admin.contains(r#"<a href="/admin""#));
         assert!(footer_admin.contains("Admin Panel"));
+        assert!(footer_admin.contains("https://status.hatsuneakiko.io.vn/"));
     }
 
     #[test]

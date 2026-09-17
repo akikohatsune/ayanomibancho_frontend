@@ -33,11 +33,32 @@
 </div>
 
 <div style="max-width: 920px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.4rem;">
-    <!-- v0.4.2 (LATEST) -->
+    <!-- v0.5.0 (LATEST) -->
     <section class="glass-card changelog-entry" style="padding: 1.8rem 2rem; border-left: 3px solid var(--primary);">
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.2rem;">
             <div style="display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
                 <span style="padding: 0.25rem 0.65rem; border-radius: 999px; color: var(--primary); background: rgba(244, 114, 182, 0.14); font-size: 0.8rem; font-weight: 800;">LATEST</span>
+                <span style="padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.8rem; font-weight: 800; background: rgba(52, 211, 153, 0.15); color: #10b981;">Early Preview 2026/09/17 - v0.5.0</span>
+                <h2 style="font-size: 1.35rem; margin: 0; font-weight: 800;">Roseflower Dedicated Multiplayer Microservice, Architecture Decoupling, RBAC & Status Monitoring</h2>
+            </div>
+            <time datetime="2026-09-17" style="color: var(--text-muted); font-size: 0.88rem; font-weight: 500;">September 17, 2026</time>
+        </div>
+        <ul style="margin: 0; padding-left: 1.3rem; color: var(--text-sub); line-height: 1.9;">
+            <li><b>Roseflower Dedicated Multiplayer Microservice:</b> Architected and deployed a dedicated high-performance multiplayer microservice (<code>roseflower</code> on port 5003) accessible at <code>https://roseflower.hatsuneakiko.io.vn/</code> and <code>/multi</code>. Features real-time lobby tracking, player slots (Red/Blue teams, ready/playing states), beatmap metadata with osu! direct links, and completed round match history with winner highlights.</li>
+            <li><b>Roseflower UI Modernization & Official Branding:</b> Upgraded Roseflower to a clean flat interface matching AyanomiBancho aesthetics. Added official favicon, brand logo in navbar and footer, Discord Open Graph & Twitter embed cards, automatic <code>/favicon.ico</code> redirection, and resolved absolute navigation links back to the main website.</li>
+            <li><b>Gateway Reverse Proxy Routing & Header Propagation:</b> Updated AyanomiBancho Gateway (port 5000) to transparently route <code>roseflower.&lt;domain&gt;</code> and <code>/multi</code> traffic to Roseflower while propagating the <code>X-Forwarded-Host</code> header so downstream services retain public domain awareness.</li>
+            <li><b>Frontend Decoupling & Media Symlink Protection:</b> Completely decoupled the web frontend into an independent service (<code>ayanomi_frontend</code> on port 5002) with its own isolated runtime while ensuring custom avatars and banners persist via persistent symlinks.</li>
+            <li><b>Admin Panel Role-Based Access Control (RBAC):</b> Restricted the <code>Admin Panel</code> link across the entire platform. The link is now completely hidden from unauthenticated visitors and regular players. Only logged-in users possessing the <b>[AM]</b> Server Admin badge see the link in the footer and via the <code>🛡️ Admin Panel</code> shortcut in the user profile dropdown menu.</li>
+            <li><b>Granular Server Uptime Display:</b> Enhanced the uptime counter on the Admin Dashboard from a minutes-only format (<code>24m</code>) to full day, hour, minute, and second precision (<code>Xh Ym Zs</code> / <code>Xd Xh Ym Zs</code>).</li>
+            <li><b>Public Status Monitoring Integration:</b> Added a direct link to the official server status page (<code>https://status.hatsuneakiko.io.vn/</code>) in the website footer with dynamic domain resolution.</li>
+            <li><b>Comprehensive Test Suite:</b> Added automated unit tests validating conditional admin link visibility, uptime duration formatting, and template rendering, maintaining a 100% test pass rate across 52 test suites.</li>
+        </ul>
+    </section>
+
+    <!-- Early Preview 2026/09/14 - v0.4.2 -->
+    <section class="glass-card changelog-entry" style="padding: 1.8rem 2rem; border-left: 3px solid #34d399;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.2rem;">
+            <div style="display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
                 <span style="padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.8rem; font-weight: 800; background: rgba(52, 211, 153, 0.15); color: #10b981;">Early Preview 2026/09/14 - v0.4.2</span>
                 <h2 style="font-size: 1.35rem; margin: 0; font-weight: 800;">Cloudflare Turnstile Bot Protection, Dynamic Menu Backgrounds & QUIC Tunnel Stability</h2>
             </div>
