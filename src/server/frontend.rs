@@ -438,9 +438,9 @@ pub fn resolve_multi_url(domain: &str) -> String {
     let host_part = clean_domain.split(':').next().unwrap_or("127.0.0.1");
 
     if host_part == "127.0.0.1" || host_part == "localhost" || host_part == "0.0.0.0" {
-        "http://127.0.0.1:5003/api/multi/rooms".to_string()
+        "http://127.0.0.1:5003/multi".to_string()
     } else {
-        format!("https://roseflower.{}/api/multi/rooms", host_part)
+        format!("https://roseflower.{}/multi", host_part)
     }
 }
 
