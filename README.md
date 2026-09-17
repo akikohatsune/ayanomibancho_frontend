@@ -16,3 +16,12 @@ cargo run --release
 ```
 
 The frontend listens on port 5002 (configurable via config.toml -> web_port).
+
+## Related Repositories
+- Core Bancho & Gateway:
+  - GitHub: https://github.com/akikohatsune/ayanomibancho
+  - GitLab: https://gitlab.com/luminehq/ayanomibancho
+- Multiplayer Service (Roseflower):
+  - GitHub: https://github.com/akikohatsune/roseflower
+  - GitLab: https://gitlab.com/luminehq/roseflower
+
