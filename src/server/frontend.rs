@@ -464,15 +464,10 @@ pub fn render_navbar(active: &str, server_name: &str, user: Option<&User>, _is_a
                         </div>
                         <div class="user-dropdown-card" id="userDropdownMenu">
                             <div class="dropdown-header-banner" style="background-image: linear-gradient(180deg, rgba(15,23,42,0.15) 0%, rgba(15,23,42,0.85) 100%), url('/banner/{id}');">
-                                <div class="dropdown-osu-hexagon">
-                                    <svg viewBox="0 0 100 100" class="osu-hexagon-svg" width="46" height="46">
-                                        <polygon points="50,6 90,28 90,72 50,94 10,72 10,28" fill="none" stroke="#ffffff" stroke-width="6"/>
-                                        <circle cx="50" cy="50" r="22" fill="#ffffff"/>
-                                        <circle cx="50" cy="50" r="14" fill="#0f172a"/>
-                                        <line x1="38" y1="62" x2="62" y2="62" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
-                                    </svg>
-                                </div>
-                                <div class="dropdown-username">{name}</div>
+                                <a href="/u/{id}" class="dropdown-avatar-wrapper" title="Trang cá nhân của {name}">
+                                    <img src="/a/{id}" class="dropdown-header-avatar nav-avatar-img" alt="{name}">
+                                </a>
+                                <a href="/u/{id}" class="dropdown-username">{name}</a>
                             </div>
                             <div class="dropdown-menu-links">
                                 <a href="/u/{id}" class="dropdown-link-row">
