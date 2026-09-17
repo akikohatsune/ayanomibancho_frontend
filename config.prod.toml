@@ -43,10 +43,10 @@ artist_name = "AyanomiBancho"
 
 [ratelimit]
 enabled = true
-general_rpm = 3600
-bancho_rpm = 3600
-direct_rpm = 1800
-sensitive_rpm = 180
+general_rpm = 15000
+bancho_rpm = 15000
+direct_rpm = 9000
+sensitive_rpm = 1200
 whitelist_private = true
 
 [turnstile]
