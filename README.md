@@ -11,8 +11,8 @@ The dedicated Web Dashboard, API, and Frontend service for [AyanomiBancho](https
 
 ## Running Locally
 
-`ash
+```bash
 cargo run --release
-`
+```
 
 The frontend listens on port 5002 (configurable via config.toml -> web_port).
